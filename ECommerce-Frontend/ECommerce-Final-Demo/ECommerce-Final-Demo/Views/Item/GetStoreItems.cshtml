@@ -1,0 +1,18 @@
+﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.ItemViewModel>
+
+@{
+    ViewData["Title"] = "GetStoreItems";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div>
+    @if (Model != null && Model.Any())
+{
+    @await Html.PartialAsync("_StoreItemspartial", Model)
+}
+else
+{
+    <p>No items available.</p>
+}
+</div>
+

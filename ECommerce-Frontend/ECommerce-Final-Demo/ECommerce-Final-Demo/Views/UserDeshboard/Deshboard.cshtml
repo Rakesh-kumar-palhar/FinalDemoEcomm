@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "Deshboard";
+    var role = ViewBag.Role as string;
+}
+
+
+
+@if (role == "SuperAdmin")
+{
+    <h3>Welcome to Super Admin Dashboard</h3>
+    
+}
+else if (role == "StoreAdmin")
+{
+    <h3>Welcome to Store Admin Dashboard</h3>
+    
+}
+else if (role == "User")
+{
+    <h3>Welcome to User Dashboard</h3>
+   
+}
+else
+{
+    <h3>Welcome to your dashboard</h3>
+    <p>No specific actions available for your role.</p>
+}

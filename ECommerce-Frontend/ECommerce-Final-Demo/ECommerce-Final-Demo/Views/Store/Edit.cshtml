@@ -1,0 +1,111 @@
+﻿@model ECommerce_Final_Demo.Models.ViewModels.StoreViewModel
+
+<h4>StoreViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+           
+            
+           
+            
+            <div class="form-group">
+                <label asp-for="CountryId" class="control-label">Country</label>
+                <select id="CountryId" asp-for="CountryId" class="form-control">
+                    <option value="">Select Country</option>
+                </select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StateId" class="control-label">State</label>
+                <select id="StateId" asp-for="StateId" class="form-control">
+                    <option value="">Select State</option>
+                </select>
+                <span asp-validation-for="StateId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CityId" class="control-label">City</label>
+                <select id="CityId" asp-for="CityId" class="form-control">
+                    <option value="">Select City</option>
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <input asp-for="Image" class="form-control" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" type="file" class="form-control" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Load countries on page load
+            $.getJSON('@Url.Action("LoadCountries", "Location")', function (countries) {
+
+                $.each(countries, function (index, country) {
+                    $('#CountryId').append('<option value="' + country.id + '">' + country.name + '</option>');
+                });
+            });
+
+            // Load states when a country is selected
+            $('#CountryId').change(function () {
+                var countryId = $(this).val();
+                $('#StateId').empty();
+                $('#CityId').empty();
+                $('#StateId').append('<option value="">Select State</option>');
+                $('#CityId').append('<option value="">Select City</option>');
+                if (countryId) {
+                    $.getJSON('@Url.Action("LoadStates", "Location")', { countryId: countryId }, function (states) {
+                        $('#StateId').append('<option value="">Select State</option>');
+                        $.each(states, function (index, state) {
+                            $('#StateId').append('<option value="' + state.id + '">' + state.name + '</option>');
+                        });
+                    });
+                }
+            });
+
+            // Load cities when a state is selected
+            $('#StateId').change(function () {
+                var stateId = $(this).val();
+                $('#CityId').empty();
+                if (stateId) {
+                    $.getJSON('@Url.Action("LoadCities", "Location")', { stateId: stateId }, function (cities) {
+                        $('#CityId').append('<option value="">Select City</option>');
+                        $.each(cities, function (index, city) {
+                            $('#CityId').append('<option value="' + city.id + '">' + city.name + '</option>');
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,105 @@
+﻿@{
+    var role = ViewBag.Role as string;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ECommerce_Final_Demo</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ECommerce_Final_Demo.styles.css" asp-append-version="true" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav" style="margin-left:0;">
+
+                <li class="sidebar-brand">
+
+                 <a href="#menu-toggle" id="menu-toggle" style="margin-top:20px;float:right;"> <i class="fa fa-bars " style="font-size:20px !Important;" aria-hidden="true" aria-hidden="true"></i>
+
+                </li>
+                 @if (role == "SuperAdmin")
+                 {
+                    <li>
+                        <a href="#"><i class="fa fa-sort-alpha-asc " aria-hidden="true"> </i> <span style="margin-left:10px;">ManageUser</span>  </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-play-circle-o " aria-hidden="true"> </i> <span style="margin-left:10px;"> ManageStore</span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;"> ManageItem</span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">SelsReport</span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Order</span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Logout</span> </a>
+                    </li>
+                }else if (role == "StoreAdmin")
+                    {
+                <li>
+                    <a href="#"> <i class="fa fa-font" aria-hidden="true"> </i> <span style="margin-left:10px;"> </span> </a>
+                </li>
+                <li>
+                        <a href="#"><i class="fa fa-info-circle " aria-hidden="true"> </i> <span style="margin-left:10px;">ManageUser </span> </a>
+                </li>
+                    <li>
+                        <a href="#"><i class="fa fa-info-circle " aria-hidden="true"> </i> <span style="margin-left:10px;">ManageItem </span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Order</span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">SelsReport</span> </a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Logout</span> </a>
+                    </li>
+
+                 }else if (role == "User")
+                    {
+                   <li>
+                      <a href="@Url.Action("GetStoreItems", "Item")"><i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">Item</span></a>
+                    </li>
+                    <li>
+                        <a href="#"> <i class="fa fa-comment-o" aria-hidden="true"> </i> <span style="margin-left:10px;"> Logout</span> </a>
+                    </li>
+                    }
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+
+    <a/> 
+                        <div class="col-md-9 ms-auto">
+                            <main role="main" class="pb-3" style="padding-top: 20px;">
+                                @RenderBody()                            
+                            </main>
+                        </div>
+ </div>
+ </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
