@@ -10,102 +10,131 @@ namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/Auth")]
     [ApiController]
-    public class AuthContrller : ControllerBase
+    public class AuthController : ControllerBase
     {
-        
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly JwtTokenServices _jwtTokenServices;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        public AuthContrller(ApplicationDbContext context, JwtTokenServices jwtTokenServices, IPasswordHasher<User> passwordHasher)
+        public AuthController(ApplicationDbContext context, JwtTokenServices jwtTokenServices, IPasswordHasher<User> passwordHasher)
         {
-
+            _context = context;
             _jwtTokenServices = jwtTokenServices;
             _passwordHasher = passwordHasher;
-            _context = context;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var existingUser = await _context.Users
-           .FirstOrDefaultAsync(u => u.Email == model.Email);
-
-            if (existingUser != null)
+            try
             {
-                return BadRequest(new { Message = "User with this email already exists." });
+                var existingUser = await _context.Users
+                   .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (existingUser != null)
+                {
+                    return BadRequest(new { Message = "User with this email already exists." });
+                }
+              
+               var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    FName = model.FName,
+                    LName = model.LName,
+                    Email = model.Email,
+                    MobileNumber = model.MobileNumber,
+                    Role = "User",  // Default role
+                    CreateDate = DateTime.UtcNow,
+                    IsActive = true,
+                    Profile = model.Profile
+                };
+
+                user.Password = _passwordHasher.HashPassword(user, model.Password);
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "User registered successfully." });
             }
-            var user = new User
+            catch (Exception ex)
             {
-                Id = Guid.NewGuid(),
-                FName = model.FName,
-                LName = model.LName,
-                Email = model.Email,
-                MobileNumber = model.MobileNumber,
-                Role = "User",  // Default role
-                CreateDate = DateTime.UtcNow,
-                IsActive = true,
-                Profile = model.Profile
-            };
-
-            user.Password = _passwordHasher.HashPassword(user, model.Password);
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Message = "User registered successfully." });
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred during registration." });
+            }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == model.Email);
-
-            if (user == null || _passwordHasher.VerifyHashedPassword(user, user.Password, model.Password) == PasswordVerificationResult.Failed)
+            try
             {
-                return Unauthorized(new { Message = "Invalid email or password." });
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (user == null || _passwordHasher.VerifyHashedPassword(user, user.Password, model.Password) == PasswordVerificationResult.Failed)
+                {
+                    return Unauthorized(new { Message = "Invalid email or password." });
+                }
+
+                var token = _jwtTokenServices.GenerateToken(user.Id, user.Role, user.StoreId);
+
+                user.Token = token;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Token = token });
             }
-
-            var token = _jwtTokenServices.GenerateToken(user.Id, user.Role,user.StoreId);
-
-            user.Token = token;
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Token = token });
-            
-
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred during login." });
+            }
         }
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            // Get the user's ID from the token
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userIdClaim == null)
+            try
             {
-                return Unauthorized(new { Message = "User is not authenticated." });
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { Message = "User is not authenticated." });
+                }
+
+                var userId = Guid.Parse(userIdClaim);
+                var user = await _context.Users.FindAsync(userId);
+
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found." });
+                }
+
+                user.Token = null;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "User logged out successfully." });
             }
-
-            // Parse the userId (assuming it is a Guid)
-            var userId = Guid.Parse(userIdClaim);
-
-            // Find the user by ID
-            var user = await _context.Users.FindAsync(userId);
-
-            if (user == null)
+            catch (Exception ex)
             {
-                return NotFound(new { Message = "User not found." });
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred during logout." });
             }
-
-            // Clear the token
-            user.Token = null;
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Message = "User logged out successfully." });
         }
 
+        private async Task LogException(Exception ex)
+        {
+            var logger = new Logger
+            {
+                ExceptionType = ex.GetType().ToString(),
+                Message = ex.Message,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.Loggers.Add(logger);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace ECommerce_Final_Demo.Controllers
 {
@@ -19,65 +21,143 @@ namespace ECommerce_Final_Demo.Controllers
         [HttpGet("Countrys")]
         public async Task<IActionResult> GetCountries()
         {
-            var Countrys = await _context.Countrys.ToListAsync();
-            return Ok(Countrys);
+            try
+            {
+                var countries = await _context.Countrys.ToListAsync();
+                return Ok(countries);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving countries." });
+            }
         }
 
         [HttpGet("States")]
         public async Task<IActionResult> GetStates([FromQuery] int countryId)
         {
-            var states = await _context.States
-                .Where(s => s.CountryId == countryId)
-                .ToListAsync();
+            try
+            {
+                var states = await _context.States
+                    .Where(s => s.CountryId == countryId)
+                    .ToListAsync();
 
-            return Ok(states);
+                if (states == null || !states.Any())
+                {
+                    return NotFound(new { Message = "No states found for the given country ID." });
+                }
+
+                return Ok(states);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving states." });
+            }
         }
+
         [HttpGet("Cities")]
         public async Task<IActionResult> GetCities([FromQuery] int stateId)
         {
-            var cities = await _context.Citys
-                .Where(c => c.StateId == stateId)
-                .ToListAsync();
+            try
+            {
+                var cities = await _context.Citys
+                    .Where(c => c.StateId == stateId)
+                    .ToListAsync();
 
-            return Ok(cities);
+                if (cities == null || !cities.Any())
+                {
+                    return NotFound(new { Message = "No cities found for the given state ID." });
+                }
+
+                return Ok(cities);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving cities." });
+            }
         }
+
         [HttpGet("countries/{id}")]
         public async Task<ActionResult<Country>> GetCountryById(int id)
         {
-            var country = await _context.Countrys.FindAsync(id);
-
-            if (country == null)
+            try
             {
-                return NotFound();
-            }
+                var country = await _context.Countrys.FindAsync(id);
 
-            return Ok(country);
+                if (country == null)
+                {
+                    return NotFound(new { Message = "Country not found." });
+                }
+
+                return Ok(country);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving the country." });
+            }
         }
 
         [HttpGet("states/{id}")]
         public async Task<ActionResult<State>> GetStateById(int id)
         {
-            var state = await _context.States.FindAsync(id);
-
-            if (state == null)
+            try
             {
-                return NotFound();
-            }
+                var state = await _context.States.FindAsync(id);
 
-            return Ok(state);
+                if (state == null)
+                {
+                    return NotFound(new { Message = "State not found." });
+                }
+
+                return Ok(state);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving the state." });
+            }
         }
 
         [HttpGet("cities/{id}")]
         public async Task<ActionResult<City>> GetCityById(int id)
         {
-            var city = await _context.Citys.FindAsync(id);
-
-            if (city == null)
+            try
             {
-                return NotFound();
-            }
+                var city = await _context.Citys.FindAsync(id);
 
-            return Ok(city);
+                if (city == null)
+                {
+                    return NotFound(new { Message = "City not found." });
+                }
+
+                return Ok(city);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving the city." });
+            }
+        }
+
+        private async Task LogException(Exception ex)
+        {
+            // Log the exception details to a database or file
+            var logger = new Logger
+            {
+                ExceptionType = ex.GetType().ToString(),
+                Message = ex.Message
+            };
+            _context.Loggers.Add(logger);
+            await _context.SaveChangesAsync();
         }
     }
 }

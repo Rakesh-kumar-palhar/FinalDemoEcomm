@@ -1,11 +1,9 @@
-﻿namespace ECommerce_Final_Demo.Model.DTO
+﻿namespace ECommerce_Final_Demo.Models
 {
-    public class CartItemDto
+    public class AddToCart
     {
         public Guid ItemId { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
-
-        public string? ItemName { get; set; }
     }
 }

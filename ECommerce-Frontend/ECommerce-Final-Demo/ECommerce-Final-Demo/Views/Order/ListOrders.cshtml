@@ -1,0 +1,40 @@
+﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.OrderViewModel>
+
+<h3>List Of Orders</h3>
+
+@{
+    ViewData["Title"] = "ListOrders";
+}
+
+<h1>ListOrders</h1>
+<table class="table">
+    <thead>
+        <tr>
+           
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().StoreName)</th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().UserName)</th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().OrderDate)</th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().TotalAmount)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+               
+                <td>@Html.DisplayFor(modelItem => item.StoreName)</td>
+                <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.TotalAmount)</td>
+                <td>
+
+                    <form asp-action="AcceptOrder" asp-controller="Order" asp-route-orderid="@item.OrderId" method="post">                       
+                        <button type="submit" class="btn btn-success">Accept</button>
+                    </form>
+                   
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

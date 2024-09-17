@@ -85,7 +85,27 @@ namespace ECommerce_Final_Demo.Controllers
             return Ok("orderplaced succesfull");
             //new { OrderId = order.OrderId, TotalAmount = order.TotalAmount }
         }
+        [HttpGet("ListOrders")]
+        public async Task<IActionResult> ListOrders()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.User)   // Load related User entity
+                .Include(o => o.Store)  // Load related Store entity
+                .Select(o => new OrderDto
+                {
+                    OrderId = o.OrderId,
+                    UserId = o.UserId,
+                    UserName = o.User.FName + " " + o.User.LName, 
+                    StoreId = o.StoreId,
+                    StoreName = o.Store.Name, 
+                    OrderDate = o.OrderDate,
+                    TotalAmount = o.TotalAmount,  
+                    
+                })
+                .ToListAsync();
 
+            return Ok(orders);
+        }
         [HttpPost("accept/{orderId}")]
         public async Task<IActionResult> AcceptOrder(Guid orderId)
         {

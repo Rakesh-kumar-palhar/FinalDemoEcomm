@@ -29,7 +29,7 @@ namespace ECommerce_Final_Demo.Controllers
             var httpClient = _httpClientFactory.CreateClient();
 
             // API endpoint to fetch all users
-            var url = $"{_baseUrl}User/allusers"; // Adjust the endpoint as necessary
+            var url = $"{_baseUrl}User/allusers"; 
 
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -38,7 +38,7 @@ namespace ECommerce_Final_Demo.Controllers
 
                 var users = JsonSerializer.Deserialize<List<User>>(responseContent, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use camelCase to match JSON property names
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
                 });
                 //var userViewModels = users.Select(User.ToViewModel).ToList();
 
@@ -67,7 +67,7 @@ namespace ECommerce_Final_Demo.Controllers
 
                 return View(userViewModels);
                 
-                //return View(users);
+                
             }
             return Json(new { error = "An error occurred while processing your request." });
         }
@@ -104,12 +104,15 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Delete(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
+
+
             var url = $"{_baseUrl}User/deleteuser{Id}"; // The API endpoint to delete the user
 
             var response = await httpClient.DeleteAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
+              
                 return RedirectToAction("StoreUsers"); // Redirect back to the user list after deletion
             }
 

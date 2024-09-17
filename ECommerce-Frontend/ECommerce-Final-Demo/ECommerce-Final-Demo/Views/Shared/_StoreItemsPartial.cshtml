@@ -1,10 +1,9 @@
-﻿
-@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.ItemViewModel>
+﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.ItemViewModel>
 
 <table class="table">
     <thead>
         <tr>
-           
+
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -14,35 +13,50 @@
             <th>
                 @Html.DisplayNameFor(model => model.Price)
             </th>
-           
-            <th>               
+
+            <th>
                 Image
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-           
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-           
-               <td>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+
+                <td>
                     <img src="@Url.Content("~/images/" + item.Image)" alt="Item Image" style="width:50px; height:auto;" />
-               </td> 
-              <td>    
-                @Html.ActionLink("AddToCart", "AddToCart", new {  id=item.Id  }) |
-               
-            </td>
-        </tr>
-}
+                </td>
+                <td>
+                    @using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post))
+                    {
+                        @Html.Hidden("id", item.Id)
+                        @Html.Hidden("price", item.Price)
+                        <input type="number" name="quantity" min="1" value="1" style="width:60px;" />
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@using (Html.BeginForm("PlaceOrder", "Order", FormMethod.Post))
+
+{
+    <!-- Hidden input to pass StoreId -->
+    @Html.Hidden("StoreId", Model.FirstOrDefault()?.StoreId) <!-- Ensure StoreId is available and valid -->
+
+    <button type="submit" class="btn btn-success">Place Order</button>
+}

@@ -1,6 +1,6 @@
-﻿namespace ECommerce_Final_Demo.Model.DTO
+﻿namespace ECommerce_Final_Demo.Models.ViewModels
 {
-    public class CartItemDto
+    public class CartItemViewModel
     {
         public Guid ItemId { get; set; }
         public decimal Price { get; set; }

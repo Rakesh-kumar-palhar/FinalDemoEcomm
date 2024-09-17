@@ -113,12 +113,12 @@ namespace ECommerce_Demo_Frontend.Controllers
                     var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
                     var token = jsonResponse["token"];
 
-                    
+
 
                     var handler = new JwtSecurityTokenHandler();
                     var jwtToken = handler.ReadJwtToken(token);
                     var StoreId = jwtToken.Claims.FirstOrDefault(c => c.Type == "StoreId");
-                    var role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role");
+                    var role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role").Value;
 
                     // Create claims for the cookie
                     var claims = new List<Claim>
@@ -126,7 +126,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                       new Claim(ClaimTypes.Name, model.Email),
                           new Claim("Token", token),
                           new Claim("StoreId", StoreId.ToString()),
-
+                          new Claim(ClaimTypes.Role,role.ToString())
                           };
 
 
@@ -155,19 +155,46 @@ namespace ECommerce_Demo_Frontend.Controllers
 
 
         [HttpPost]
-                [ValidateAntiForgeryToken]
-                public IActionResult Logout()
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var logoutUrl = $"{_baseUrl}Auth/logout";
+
+            try
+            {
+                var response = await client.PostAsync(logoutUrl, null);
+
+                if (response.IsSuccessStatusCode)
                 {
                     // Clear the session data
                     HttpContext.Session.Remove("UserSession");
 
+                    // Redirect to login page or any other page
                     return RedirectToAction("Login", "Auth");
                 }
-
+                else
+                {
+                    // Handle failure response
+                    ViewBag.ErrorMessage = "Logout failed. Please try again.";
+                    return View("Error");
+                }
             }
-        }
+            catch (HttpRequestException e)
+            {
+                // Handle network errors
+                ViewBag.ErrorMessage = "Network error: " + e.Message;
+                return View("Error");
+            }
 
-    
+        }
+    }
+
+}
 
 
         

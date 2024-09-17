@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ECommerce_Final_Demo.Controllers
 {
@@ -17,59 +20,87 @@ namespace ECommerce_Final_Demo.Controllers
         {
             _context = context;
         }
+
         [HttpGet("allItem")]
-        // [Authorize(Roles = "SuperAdmin ")]
+        // [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> GetItem()
         {
-            // var Item = await _context.Items.ToListAsync();
-            var Item = await _context.Items
-            .Include(u => u.Store)
-            .ToListAsync();
+            try
+            {
+                var items = await _context.Items
+                    .Include(u => u.Store)
+                    .ToListAsync();
 
-            var ItemDtos = ItemDto.Mapping(Item);
+                var itemDtos = ItemDto.Mapping(items);
 
-            return Ok(ItemDtos);
+                return Ok(itemDtos);
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving items." });
+            }
         }
+
         [HttpGet("listofitem")]
-        //[Authorize]
+        // [Authorize]
         public async Task<IActionResult> GetItems(Guid storeId)
         {
-            // Get items filtered by storeId
-            var items = await _context.Items
-                                      .Where(i => i.StoreId == storeId)
-                                      .ToListAsync();
+            try
+            {
+                var items = await _context.Items
+                    .Where(i => i.StoreId == storeId)
+                    .ToListAsync();
 
-            // Map the items to DTOs
-            var itemDtos = ItemDto.Mapping(items);
+                if (items == null || !items.Any())
+                {
+                    return NotFound(new { Message = "No items found for the given store ID." });
+                }
 
-            return Ok(itemDtos);
+                var itemDtos = ItemDto.Mapping(items);
+
+                return Ok(itemDtos);
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving items." });
+            }
         }
 
-        //if you wants to add item 
         [HttpPost("additem")]
-        //[Authorize(Roles = "Super Admin, Store Admin")]
+        // [Authorize(Roles = "Super Admin, Store Admin")]
         public async Task<IActionResult> AddItem([FromBody] ItemDto itemDto)
         {
-            
-            var item = ItemDto.Mapping(itemDto);            
-            if (await _context.Items.AnyAsync(i => i.Id == item.Id))
+            try
             {
-                return Conflict(new { Message = "Item with the same ID already exists." });
-            }            
-            var storeExists = await _context.Stores.AnyAsync(s => s.Id == item.StoreId);
-            if (!storeExists)
-            {
-                return BadRequest(new { Message = "Store not found." });
-            }
-            _context.Items.Add(item);
-            await _context.SaveChangesAsync();
+                var item = ItemDto.Mapping(itemDto);
 
-           
-            return Ok("item created succesfully");
+                if (await _context.Items.AnyAsync(i => i.Id == item.Id))
+                {
+                    return Conflict(new { Message = "Item with the same ID already exists." });
+                }
+
+                var storeExists = await _context.Stores.AnyAsync(s => s.Id == item.StoreId);
+                if (!storeExists)
+                {
+                    return BadRequest(new { Message = "Store not found." });
+                }
+
+                _context.Items.Add(item);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Item created successfully." });
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while adding the item." });
+            }
         }
-        //update item by id
-        [HttpPut("updateitem{itemId:guid}")]
-       // [Authorize(Roles = "Super Admin, Store Admin")]
+
+        [HttpPut("updateitem/{itemId:guid}")]
+        // [Authorize(Roles = "Super Admin, Store Admin")]
         public async Task<IActionResult> UpdateItem(Guid itemId, [FromBody] ItemDto itemDto)
         {
             if (itemId != itemDto.Id)
@@ -77,76 +108,120 @@ namespace ECommerce_Final_Demo.Controllers
                 return BadRequest(new { Message = "Item ID mismatch." });
             }
 
-            var existingItem = await _context.Items.FindAsync(itemId);
-            if (existingItem == null)
+            try
             {
-                return NotFound(new { Message = "Item not found." });
+                var existingItem = await _context.Items.FindAsync(itemId);
+                if (existingItem == null)
+                {
+                    return NotFound(new { Message = "Item not found." });
+                }
+
+                var storeExists = await _context.Stores.AnyAsync(s => s.Id == itemDto.StoreId);
+                if (!storeExists)
+                {
+                    return BadRequest(new { Message = "Store not found." });
+                }
+
+                existingItem.Name = itemDto.Name;
+                existingItem.Type = (Item.Category)itemDto.Category;
+                existingItem.Price = itemDto.Price;
+                existingItem.Image = itemDto.Image;
+                existingItem.StoreId = itemDto.StoreId;
+
+                _context.Items.Update(existingItem);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Item updated successfully." });
             }
-            var storeExists = await _context.Stores.AnyAsync(s => s.Id == itemDto.StoreId);
-            if (!storeExists)
+            catch (Exception ex)
             {
-                return BadRequest(new { Message = "Store not found." });
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while updating the item." });
             }
-            existingItem.Name = itemDto.Name;
-            existingItem.Type = (Item.Category)itemDto.Category;
-            existingItem.Price = itemDto.Price;
-            existingItem.Image = itemDto.Image;
-            existingItem.StoreId = itemDto.StoreId;
-
-            _context.Items.Update(existingItem);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Message = "Item updated successfully." });
         }
 
-        // Item delete by id
-        [HttpDelete("deleteitem{itemId:guid}")]
-        //[Authorize(Roles = "Super Admin, Store Admin")]
+        [HttpDelete("deleteitem/{itemId:guid}")]
+        // [Authorize(Roles = "Super Admin, Store Admin")]
         public async Task<IActionResult> DeleteItem(Guid itemId)
         {
-            var item = await _context.Items.FindAsync(itemId);
-
-            if (item == null)
+            try
             {
-                return NotFound(new { Message = "Item not found." });
+                var item = await _context.Items.FindAsync(itemId);
+
+                if (item == null)
+                {
+                    return NotFound(new { Message = "Item not found." });
+                }
+
+                _context.Items.Remove(item);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Item deleted successfully." });
             }
-
-            _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Message = "Item deleted successfully." });
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while deleting the item." });
+            }
         }
 
-        //item details by id
-        [HttpGet("getdetailsbyid{id}")]
+        [HttpGet("getdetailsbyid/{id:guid}")]
         public async Task<ActionResult<ItemDto>> GetItemById(Guid id)
         {
-            var item = await _context.Items
-                .Include(i => i.Store)
-                .FirstOrDefaultAsync(i => i.Id == id);
-
-            if (item == null)
+            try
             {
-                return NotFound();
-            }
+                var item = await _context.Items
+                    .Include(i => i.Store)
+                    .FirstOrDefaultAsync(i => i.Id == id);
 
-            var itemDto = ItemDto.Mapping(item); 
-            return Ok(itemDto); 
+                if (item == null)
+                {
+                    return NotFound(new { Message = "Item not found." });
+                }
+
+                var itemDto = ItemDto.Mapping(item);
+                return Ok(itemDto);
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while retrieving the item details." });
+            }
         }
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchItems([FromQuery] ItemFilterDto filterDto)
         {
-            var query = _context.Items.AsQueryable();
-
-            if (filterDto.Category.HasValue)
+            try
             {
-                query = query.Where(i => i.Type == filterDto.Category.Value);
+                var query = _context.Items.AsQueryable();
+
+                if (filterDto.Category.HasValue)
+                {
+                    query = query.Where(i => i.Type == filterDto.Category.Value);
+                }
+
+                var items = await query.ToListAsync();
+
+                return Ok(items);
             }
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while searching for items." });
+            }
+        }
 
-            var items = await query.ToListAsync();
-
-            return Ok(items);
+        private async Task LogException(Exception ex)
+        {
+            // Log the exception details to a database or file
+            var logger = new Logger
+            {
+                ExceptionType = ex.GetType().ToString(),
+                Message = ex.Message
+            };
+            _context.Loggers.Add(logger);
+            await _context.SaveChangesAsync();
         }
     }
 }

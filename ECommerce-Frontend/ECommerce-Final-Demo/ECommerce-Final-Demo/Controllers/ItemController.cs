@@ -91,6 +91,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             return Json(new { error = "An error occurred while processing your request." });
         }
+
         public async Task<IActionResult> Details(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
@@ -118,7 +119,7 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Delete(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var url = $"{_baseUrl}Item/deleteitem{Id}"; // The API endpoint to delete the user
+            var url = $"{_baseUrl}Item/deleteitem/{Id}"; // The API endpoint to delete the user
 
             var response = await httpClient.DeleteAsync(url);
 
@@ -135,7 +136,7 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Edit(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var url = $"{_baseUrl}Item/getdetailsbyid{Id}";
+            var url = $"{_baseUrl}Item/getdetailsbyid/{Id}";
 
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -178,7 +179,7 @@ namespace ECommerce_Final_Demo.Controllers
                 Image = imagePath // Use the new image or the existing one
             };
             var httpClient = _httpClientFactory.CreateClient();
-            var url = $"{_baseUrl}Item/updateitem{ItemViewModel.Id}";
+            var url = $"{_baseUrl}Item/updateitem/{ItemViewModel.Id}";
 
             var jsonContent = JsonSerializer.Serialize(itemData);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -192,7 +193,7 @@ namespace ECommerce_Final_Demo.Controllers
 
             // Add more detailed error information
             var errorMessage = await response.Content.ReadAsStringAsync();
-            ModelState.AddModelError("", $"Unable to update user. Server response: {errorMessage}");
+            ModelState.AddModelError("", $"Unable to update Item. Server response: {errorMessage}");
             return View(ItemViewModel);
         }
 

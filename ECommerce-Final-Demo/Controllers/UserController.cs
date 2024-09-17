@@ -115,7 +115,7 @@ namespace ECommerce_Final_Demo.Controllers
             existingUser.FName = userDto.FName;
             existingUser.LName = userDto.LName;
             existingUser.Email = userDto.Email;
-            existingUser.Password = userDto.Password; // Handle passwords securely
+            existingUser.Password = userDto.Password; 
             existingUser.MobileNumber = userDto.MobileNumber;
             existingUser.Role = userDto.Role;
             existingUser.UpdateDate = DateTime.UtcNow;

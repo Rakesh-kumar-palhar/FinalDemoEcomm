@@ -38,7 +38,7 @@ namespace ECommerce_Final_Demo.Controllers
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var storeData = JsonSerializer.Deserialize<List<Store>>(responseContent, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use camelCase to match JSON property names
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
                 });
 
                 // Manually map the data
@@ -49,8 +49,8 @@ namespace ECommerce_Final_Demo.Controllers
                     {
                         Id = store.Id,
                         Name = store.Name,
-                        Country = await _storeLocation.GetCountryNameAsync(store.CountryId), // Fetch country name
-                        State = await _storeLocation.GetStateNameAsync(store.StateId),     // Fetch state name
+                        Country = await _storeLocation.GetCountryNameAsync(store.CountryId),
+                        State = await _storeLocation.GetStateNameAsync(store.StateId),   
                         City = await _storeLocation.GetCityNameAsync(store.CityId),
                         Image = store.Image
                     };

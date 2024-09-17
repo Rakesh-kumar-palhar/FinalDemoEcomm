@@ -21,14 +21,14 @@ var provider = builder.Services.BuildServiceProvider();
 var config = provider.GetRequiredService<IConfiguration>();
 builder.Services.AddDbContext<ApplicationDbContext>(item => item.UseSqlServer(config.GetConnectionString("dbcs")));
 
-//// Clear existing logging providers
-//builder.Logging.ClearProviders();
-//builder.Logging.AddConsole(); 
-//// Register the custom logger provider
-//builder.Services.AddSingleton<ILoggerProvider, DatabaseLoggerProvider>(sp =>
-//{
-//    return new DatabaseLoggerProvider(() => sp.GetRequiredService<ApplicationDbContext>());
-//});
+// Clear existing logging providers
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+// Register the custom logger provider
+builder.Services.AddSingleton<ILoggerProvider, DatabaseLoggerProvider>(sp =>
+{
+    return new DatabaseLoggerProvider(() => sp.GetRequiredService<ApplicationDbContext>());
+});
 
 //confegure jwt authentication
 builder.Services.AddAuthentication(options =>

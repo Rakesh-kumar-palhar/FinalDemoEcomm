@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.StoreViewModel>
+﻿@* @model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.StoreViewModel>
+<h3>List Of Store</h3>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -20,7 +21,8 @@
                 @Html.DisplayNameFor(model => model.City)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Image)
+                 @Html.DisplayNameFor(model => model.Image)
+              Image
             </th>
             <th></th>
         </tr>
@@ -41,15 +43,60 @@
             <td>
                 @Html.DisplayFor(modelItem => item.City)
             </td>
-            <td>
+                <td>
+                    <img src="@Url.Content("~/images/" + item.Image)" alt="Item Image" style="width:50px; height:auto;" />
+                </td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
+            </td> *@
+@* <td>
                 @Html.ActionLink("Edit", "Edit", new { id=item.Id}) |
                     
                 @Html.ActionLink("Delete", "Delete", new { id = item.Id })
             </td>
         </tr>
 }
+    </tbody>
+</table>
+  *@
+
+                @model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.StoreViewModel>
+
+<h3>List of Stores</h3>
+
+<!-- Button to create a new store -->
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
+</p>
+
+<!-- Store Table -->
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Country)</th>
+            <th>@Html.DisplayNameFor(model => model.State)</th>
+            <th>@Html.DisplayNameFor(model => model.City)</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var store in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => store.Name)</td>
+                <td>@Html.DisplayFor(modelItem => store.Country)</td>
+                <td>@Html.DisplayFor(modelItem => store.State)</td>
+                <td>@Html.DisplayFor(modelItem => store.City)</td>
+                <td>
+                    <img src="@Url.Content("~/images/" + store.Image)" alt="Store Image" style="width:70px; height:auto;" />
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@store.Id">Edit</a> |
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@store.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

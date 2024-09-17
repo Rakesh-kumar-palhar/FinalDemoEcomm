@@ -1,6 +1,6 @@
-﻿@{
-    var role = ViewBag.Role as string;
-}
+﻿   
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,16 +24,26 @@
                  <a href="#menu-toggle" id="menu-toggle" style="margin-top:20px;float:right;"> <i class="fa fa-bars " style="font-size:20px !Important;" aria-hidden="true" aria-hidden="true"></i>
 
                 </li>
-                 @if (role == "SuperAdmin")
+                 @if (User.IsInRole ("SuperAdmin"))
                  {
                     <li>
-                        <a href="#"><i class="fa fa-sort-alpha-asc " aria-hidden="true"> </i> <span style="margin-left:10px;">ManageUser</span>  </a>
+                        <a href="@Url.Action("StoreUsers", "User")">
+                            <i class="fa fa-sort-alpha-asc" aria-hidden="true">
+                            </i> <span style="margin-left:10px;">ManageUser</span>                            
+                                          
+                        </a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-play-circle-o " aria-hidden="true"> </i> <span style="margin-left:10px;"> ManageStore</span> </a>
+                        <a href="@Url.Action("StoreList", "Store")">
+                            <i class="fa fa-play-circle-o" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">ManageStore</span>
+                        </a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;"> ManageItem</span> </a>
+                        <a href="@Url.Action("StoreItems", "Item")">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">ManageItem</span>
+                        </a>
                     </li>
                     <li>
                         <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">SelsReport</span> </a>
@@ -41,38 +51,57 @@
                     <li>
                         <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Order</span> </a>
                     </li>
-                    <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Logout</span> </a>
-                    </li>
-                }else if (role == "StoreAdmin")
+                    <form asp-action="Logout" asp-controller="Auth" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-link" style="border: none;color:azure background: none;">
+                            <i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">Logout</span>
+                        </button>
+                    </form>
+                }
+                @if (User.IsInRole("StoreAdmin"))
                     {
-                <li>
-                    <a href="#"> <i class="fa fa-font" aria-hidden="true"> </i> <span style="margin-left:10px;"> </span> </a>
-                </li>
-                <li>
-                        <a href="#"><i class="fa fa-info-circle " aria-hidden="true"> </i> <span style="margin-left:10px;">ManageUser </span> </a>
-                </li>
+
                     <li>
-                        <a href="#"><i class="fa fa-info-circle " aria-hidden="true"> </i> <span style="margin-left:10px;">ManageItem </span> </a>
+                        <a href="@Url.Action("StoreUsers", "User")">
+                            <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">ManageUser</span>
+                        </a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Order</span> </a>
+                        <a href="@Url.Action("StoreItems", "Item")">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">ManageItem</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("ListOrders", "Order")">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">ManageOrder</span>
+                        </a>
                     </li>
                     <li>
                         <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">SelsReport</span> </a>
                     </li>
-                    <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Logout</span> </a>
-                    </li>
+                    <form asp-action="Logout" asp-controller="Auth" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-link" style="border: none;color:azure background: none;">
+                            <i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">Logout</span>
+                        </button>
+                    </form>
 
-                 }else if (role == "User")
+                }@if (User.IsInRole("User"))
                     {
                    <li>
                       <a href="@Url.Action("GetStoreItems", "Item")"><i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">Item</span></a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-comment-o" aria-hidden="true"> </i> <span style="margin-left:10px;"> Logout</span> </a>
+                        <a href="@Url.Action("CartItems", "Cart")"><i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">CartItem</span></a>
                     </li>
+                    <form asp-action="Logout" asp-controller="Auth" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-link" style="border: none;color:azure background: none;">
+                            <i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">Logout</span>
+                        </button>
+                    </form>
+
+                   
                     }
             </ul>
         </div>

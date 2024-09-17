@@ -30,6 +30,7 @@ builder.Services.AddSingleton<FileUploadService>();
 builder.Services.AddTransient<StoreLocation>();
 
 
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();

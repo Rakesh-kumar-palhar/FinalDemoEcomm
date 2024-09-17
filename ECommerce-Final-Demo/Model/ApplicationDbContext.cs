@@ -74,6 +74,8 @@ namespace ECommerce_Final_Demo.Model
             .WithMany()
             .HasForeignKey(h => h.CityId)
             .OnDelete(DeleteBehavior.Restrict);
+
+           
         }
 
         public DbSet<User> Users { get; set; }
