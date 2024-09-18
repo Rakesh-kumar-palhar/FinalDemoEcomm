@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<FileUploadService>();
 builder.Services.AddTransient<StoreLocation>();
-
+builder.Services.AddHttpContextAccessor();
 
 
 builder.Services.AddHttpClient();

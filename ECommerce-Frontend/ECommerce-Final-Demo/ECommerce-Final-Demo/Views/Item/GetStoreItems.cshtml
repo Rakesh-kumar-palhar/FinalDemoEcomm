@@ -3,6 +3,19 @@
 @{
     ViewData["Title"] = "GetStoreItems";
 }
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        alert('@TempData["SuccessMessage"]');
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        alert('@TempData["ErrorMessage"]');
+    </script>
+}
 
 <h1>@ViewData["Title"]</h1>
 <div>

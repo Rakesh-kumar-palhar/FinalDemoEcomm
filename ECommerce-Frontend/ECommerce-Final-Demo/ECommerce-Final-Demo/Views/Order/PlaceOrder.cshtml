@@ -1,8 +1,23 @@
 ﻿
 @{
     ViewData["Title"] = "PlaceOrder";
-    Layout = "_storeItempartial";
+    
 }
 
-<h1>Orderplaced Succesfully</h1>
 
+
+<div>
+    <!-- Your form and other content here -->
+    @if (ViewBag.Message != null)
+    {
+        <script>
+            alert('@ViewBag.Message');
+        </script>
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <script>
+            alert('Error: @ViewBag.ErrorMessage');
+        </script>
+    }
+</div>

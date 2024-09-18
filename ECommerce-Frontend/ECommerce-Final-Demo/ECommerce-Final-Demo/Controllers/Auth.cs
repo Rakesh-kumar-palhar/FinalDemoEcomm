@@ -8,6 +8,8 @@ using ECommerce_Final_Demo.FileUpload;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ECommerce_Final_Demo.Models;
 
 
 namespace ECommerce_Demo_Frontend.Controllers
@@ -72,8 +74,9 @@ namespace ECommerce_Demo_Frontend.Controllers
                 }
                 else
                 {
-                    // Handle error response, perhaps display the error message
-                    ModelState.AddModelError("", "Registration failed. Please try again.");
+                   
+                    ModelState.AddModelError(string.Empty,"Registration failed.User Exist In this Email.");
+
                 }
             }
 
@@ -124,6 +127,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                     var claims = new List<Claim>
                           {
                       new Claim(ClaimTypes.Name, model.Email),
+                       
                           new Claim("Token", token),
                           new Claim("StoreId", StoreId.ToString()),
                           new Claim(ClaimTypes.Role,role.ToString())

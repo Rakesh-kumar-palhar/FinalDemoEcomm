@@ -14,7 +14,26 @@
     
 </head>
 <body>
+    
+
     <div id="wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">ECommerce</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <span class="nav-link">Welcome, @User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+                
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav" style="margin-left:0;">
@@ -46,13 +65,25 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">SelsReport</span> </a>
+                        <a href="@Url.Action("DayByDayPurchase", "Report")">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">PurchaseReport</span>
+                        </a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">Order</span> </a>
+                        <a href="@Url.Action("ListOrders", "Order")">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">ManageOrder</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Edit", "User", new {  id = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value })">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">EditProfile</span>
+                        </a>
                     </li>
                     <form asp-action="Logout" asp-controller="Auth" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-link" style="border: none;color:azure background: none;">
+                        <button type="submit" class="btn btn-link" style="border: none;color:azure;">
                             <i class="fa fa-comment-o" aria-hidden="true"></i> <span style="margin-left:10px;">Logout</span>
                         </button>
                     </form>
@@ -79,7 +110,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"> <i class="fa fa-puzzle-piece" aria-hidden="true"> </i> <span style="margin-left:10px;">SelsReport</span> </a>
+                        <a href="@Url.Action("DayByDayPurchase", "Report")">
+                            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                            <span style="margin-left:10px;">PurchaseReport</span>
+                        </a>
                     </li>
                     <form asp-action="Logout" asp-controller="Auth" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-link" style="border: none;color:azure background: none;">

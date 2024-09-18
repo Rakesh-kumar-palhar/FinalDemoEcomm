@@ -91,14 +91,14 @@ namespace ECommerce_Final_Demo.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     // Handle success
                     ViewBag.Message = "Order placed successfully!";
-                    return View("Success"); // Redirect or display success message
+                    return View(); // Redirect or display success message
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     // Handle error
-                    ViewBag.ErrorMessage = "Error placing the order: " + errorMessage;
-                    return View("Error"); // Redirect or display error message
+                    ViewBag.ErrorMessage = "Oops! cart is empty" + errorMessage;
+                    return View(); 
                 }
             }
             catch (HttpRequestException e)
@@ -129,7 +129,6 @@ namespace ECommerce_Final_Demo.Controllers
             return storeIdClaim?.Value; // Return StoreId or null
         }
 
-        [HttpPost]
         public async Task<IActionResult> AcceptOrder(Guid orderId)
         {
             var httpClient = _httpClientFactory.CreateClient();
@@ -156,7 +155,7 @@ namespace ECommerce_Final_Demo.Controllers
                         Bill = result.Bill
                     };
 
-                    return View("AcceptOrderSuccess", viewModel);
+                    return View( viewModel);
                 }
                 else
                 {
@@ -169,8 +168,8 @@ namespace ECommerce_Final_Demo.Controllers
                 ModelState.AddModelError("", "Network error: " + ex.Message);
                 return View("Error");
             }
-
         }
+
 
         [HttpPost]
         public async Task<IActionResult> DeleteOrder(Guid orderId)

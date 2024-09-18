@@ -3,6 +3,7 @@ using ECommerce_Final_Demo.Helper;
 using ECommerce_Final_Demo.Models;
 using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using static ECommerce_Final_Demo.Helper.StoreLocation;
@@ -62,6 +63,57 @@ namespace ECommerce_Final_Demo.Controllers
             else
             {                
                 return View("Error"); 
+            }
+        }
+
+        //for dropdown 
+        public async Task<IActionResult> GetStores()
+        {
+            try
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+                var url = $"{_baseUrl}stores/allstores";
+
+                var response = await httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    // Log response content for debugging
+                    Console.WriteLine($"Response Content: {responseContent}");
+
+                    var storeData = JsonSerializer.Deserialize<List<Store>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    });
+
+                    if (storeData == null)
+                    {
+                        return StatusCode((int)HttpStatusCode.NoContent); // No content found
+                    }
+
+                    // Simplified data mapping for dropdown
+                    var storeViewModels = storeData.Select(store => new
+                    {
+                        Id = store.Id,
+                        Name = store.Name
+                    }).ToList();
+
+                    return Json(storeViewModels);
+                }
+                else
+                {
+                    // Log error status code for debugging
+                    Console.WriteLine($"API Request Failed: {response.StatusCode}");
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log exception details
+                Console.WriteLine($"Exception: {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
         public IActionResult Create()

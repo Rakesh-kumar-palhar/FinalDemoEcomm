@@ -49,11 +49,21 @@
                 </label>
             </div>
             
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="StoreId" class="control-label"></label>
                 <input asp-for="StoreId" class="form-control" />
                 <span asp-validation-for="StoreId" class="text-danger"></span>
+            </div> *@
+
+            <div class="form-group">
+                <label asp-for="StoreId" class="control-label"></label>
+                <select asp-for="StoreId" class="form-control" id="storeDropdown">
+                    <option value="">Select Store</option>
+                </select>
+                <span asp-validation-for="StoreId" class="text-danger"></span>
             </div>
+
+
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" class="form-control" />
@@ -70,3 +80,36 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("GetStores", "Store")', // Ensure this is the correct action and controller
+                type: 'GET',
+                success: function (data) {
+                    var $storeDropdown = $('#storeDropdown');
+                    $storeDropdown.empty(); // Clear existing options
+
+                    $storeDropdown.append($('<option>', { 
+                        value: '', 
+                        text: 'Select Store' 
+                    }));
+
+                    $.each(data, function (index, store) {
+                        $storeDropdown.append($('<option>', { 
+                            value: store.id, 
+                            text: store.name 
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                    console.log("Status: " + status);
+                    console.log("Response: " + xhr.responseText);
+                    alert('Failed to load store data.');
+                }
+            });
+        });
+    </script>
+}

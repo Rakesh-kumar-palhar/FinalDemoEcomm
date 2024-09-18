@@ -16,11 +16,9 @@ namespace ECommerce_Final_Demo.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddToCart(Guid id, decimal price, int quantity)
+        public async Task<IActionResult> AddToCart(Guid id, decimal price, int quantity)
         {
             var token = HttpContext.Session.GetString("UserSession");
-
-
 
             // Create the HttpClient instance
             var client = _httpClientFactory.CreateClient();
@@ -41,20 +39,29 @@ namespace ECommerce_Final_Demo.Controllers
             // Define the URL for adding the item
             var addItemUrl = $"{_baseUrl}Cart/additem";
 
-            // Send the POST request
-            var response = await client.PostAsync(addItemUrl, content);
+            try
+            {               
+                var response = await client.PostAsync(addItemUrl, content);
 
-            if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
+                {
+                    
+                    TempData["SuccessMessage"] = "Item added to cart successfully!";
+                }
+                else
+                {
+                   
+                    TempData["ErrorMessage"] = "Error adding item to cart: " + await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (HttpRequestException e)
             {
+                
+                TempData["ErrorMessage"] = "Network error: " + e.Message;
+            }
 
-            }
-            else
-            {
-                return Json(new { success = false, error = response.ReasonPhrase });
-            }
-            return Json(new { success = true, succes = response.ReasonPhrase });
+            return RedirectToAction("GetStoreItems", "Item"); // Redirect to an appropriate view or page
         }
-
         public async Task<IActionResult> CartItems()
         {
             var token = HttpContext.Session.GetString("UserSession");
@@ -68,27 +75,22 @@ namespace ECommerce_Final_Demo.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 // If the API call fails, show the error view
-                ViewBag.ErrorMessage = "Error fetching cart items.";
-                return View("Error");
+                ViewBag.ErrorMessage = "Cart Is Empty";
+                return View();
             }
 
             // Deserialize the JSON response to a list of CartItemViewModel
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var cartItems = JsonSerializer.Deserialize<List<CartItemViewModel>>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            if (cartItems == null || !cartItems.Any())
-            {
-                // If there are no items in the cart, show the empty cart view
-                ViewBag.EmptyCartMessage = "Your cart is empty.";
-                return View("CartEmpty"); 
-            }
+           
 
             // If there are items, show the cart items view
             return View(cartItems);
         }
 
         [HttpPost]
-        public async Task<JsonResult> RemoveFromCart(Guid itemId)
+        public async Task<IActionResult> RemoveFromCart(Guid itemId)
         {
             var token = HttpContext.Session.GetString("UserSession");
 
@@ -105,13 +107,17 @@ namespace ECommerce_Final_Demo.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true });
+                // Set success message in TempData
+                TempData["SuccessMessage"] = "Item removed from cart successfully.";
             }
             else
             {
-                return Json(new { success = false, error = response.ReasonPhrase });
+                // Set error message in TempData
+                TempData["ErrorMessage"] = "Error removing item from cart: " + response.ReasonPhrase;
             }
 
+            // Redirect to the CartItems action to refresh the cart view
+            return RedirectToAction("CartItems", "Cart");
         }
     }
 }

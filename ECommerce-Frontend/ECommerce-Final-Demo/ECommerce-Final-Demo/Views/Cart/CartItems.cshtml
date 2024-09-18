@@ -18,6 +18,12 @@ else if (ViewBag.EmptyCartMessage != null)
         @ViewBag.EmptyCartMessage
     </div>
 }
+else if (!Model.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        Your cart is empty.
+    </div>
+}
 else
 {
     <table class="table">

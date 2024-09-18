@@ -1,12 +1,32 @@
-﻿@model ECommerce_Final_Demo.Models.AcceptOrderResponse
+﻿@model ECommerce_Final_Demo.Models.ViewModels.AcceptOrderResponse
+
 @{
     ViewData["Title"] = "AcceptOrder";
-   
 }
 
-<h1>Order Accepted</h1>
-
 <div>
-    <h3>@Model.Message</h3>
-    <pre>@Model.Bill</pre>
+    <p>@Model.Message</p>
+    <h3>Bill Details</h3>
+    <table class="table">
+        <tr>
+            <th>Order ID</th>
+            <td>@Model.Bill.OrderId</td>
+        </tr>
+        <tr>
+            <th>User Name</th>
+            <td>@Model.Bill.UserName</td>
+        </tr>
+        <tr>
+            <th>Store Name</th>
+            <td>@Model.Bill.StoreName</td>
+        </tr>
+        <tr>
+            <th>Order Date</th>
+            <td>@Model.Bill.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+        </tr>
+        <tr>
+            <th>Total Amount</th>
+            <td>@Model.Bill.TotalAmount.ToString("C")</td>
+        </tr>
+    </table>
 </div>

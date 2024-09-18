@@ -17,32 +17,52 @@ namespace ECommerce_Final_Demo.Controllers
         [HttpGet("DayByDayPurchase")]
         public async Task<IActionResult> GetDayByDayPurchaseReport()
         {
-            // Get orders with their items and store information
-            var orders = await _context.Orders
-                .Include(o => o.OrderItems)
-                .Include(o => o.Store)
-                .ToListAsync();
+            try {
+                // Get orders with their items and store information
+                var orders = await _context.Orders
+                    .Include(o => o.OrderItems)
+                    .Include(o => o.Store)
+                    .ToListAsync();
 
-            // Group by date and store
-            var report = orders
-                .GroupBy(o => new { o.OrderDate.Date, o.Store.Name })
-                .Select(g => new DayByDayPurchaseReportDto
-                {
-                    Date = g.Key.Date,
-                    StoreName = g.Key.Name,
-                    TotalSales = g.Sum(o => o.OrderItems.Sum(oi => oi.Quantity * oi.Price)),
-                    OrderItems = g.SelectMany(o => o.OrderItems.Select(oi => new OrderItemDto
+                // Group by date and store
+                var report = orders
+                    .GroupBy(o => new { o.OrderDate.Date, o.Store.Name })
+                    .Select(g => new DayByDayPurchaseReportDto
                     {
-                        ItemId = oi.ItemId,
-                        Quantity = oi.Quantity,
-                        Price = oi.Price,
-                       
-                    })).ToList()
-                })
-                .OrderBy(r => r.Date)
-                .ToList();
+                        Date = g.Key.Date,
+                        StoreName = g.Key.Name,
+                        TotalSales = g.Sum(o => o.OrderItems.Sum(oi => oi.Quantity * oi.Price)),
+                        OrderItems = g.SelectMany(o => o.OrderItems.Select(oi => new OrderItemDto
+                        {
+                            ItemId = oi.ItemId,
+                            Quantity = oi.Quantity,
+                            Price = oi.Price,
 
-            return Ok(report);
+                        })).ToList()
+                    })
+                    .OrderBy(r => r.Date)
+                    .ToList();
+
+                return Ok(report);
+            }
+            catch (Exception ex)
+            {
+                await LogException(ex);
+                return StatusCode(500, new { Message = "An error occurred while GetDayByDayPurchaseReport generate." });
+            }
+
+           
+        }
+        private async Task LogException(Exception ex)
+        {
+            // Log the exception details to a database or file
+            var logger = new Logger
+            {
+                ExceptionType = ex.GetType().ToString(),
+                Message = ex.Message
+            };
+            _context.Loggers.Add(logger);
+            await _context.SaveChangesAsync();
         }
     }
 }
