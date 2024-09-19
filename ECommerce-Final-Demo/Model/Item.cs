@@ -28,10 +28,11 @@ namespace ECommerce_Final_Demo.Model
 
             [Required]
             public string? Image { get; set; }
-            
 
-            //Relationship
-            [Required]
+            public bool IsDelete { get; set; } = true;
+
+        //Relationship
+           [Required]
             public Guid? StoreId { get; set; } 
             [ForeignKey("StoreId")]
             public Store? Store { get; set; }

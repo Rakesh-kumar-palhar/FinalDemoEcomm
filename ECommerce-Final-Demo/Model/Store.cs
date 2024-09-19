@@ -21,7 +21,8 @@ namespace ECommerce_Final_Demo.Model
         [Required]
         [ForeignKey("City")]
         public int CityId { get; set; } //Enum for city
-        public string? Image { get; set; } 
+        public string? Image { get; set; }
+        public bool IsDelete { get; set; } = true;
         //relationship
         public virtual ICollection<User>? Users { get; set; }
         public virtual ICollection<Item>? Items { get; set; }

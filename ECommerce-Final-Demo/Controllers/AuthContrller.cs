@@ -71,6 +71,15 @@ namespace ECommerce_Final_Demo.Controllers
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == model.Email);
 
+                if (user == null)
+                {
+                    return Unauthorized(new { Message = "Invalid email or password." });
+                }
+                if (!user.IsActive)
+                {
+                    return Unauthorized(new { Message = "Your account is inactive. Please contact support." });
+                }
+
                 if (user == null || _passwordHasher.VerifyHashedPassword(user, user.Password, model.Password) == PasswordVerificationResult.Failed)
                 {
                     return Unauthorized(new { Message = "Invalid email or password." });

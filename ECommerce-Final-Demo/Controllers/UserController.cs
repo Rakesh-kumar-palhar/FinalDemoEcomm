@@ -28,10 +28,14 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> GetUsers([FromQuery] Guid? storeId)
         {
             try {
+                // Fetch only active users and apply storeId filter if provided
                 var users = storeId.HasValue
-
-                    ? await _context.Users.Where(u => u.StoreId == storeId.Value).ToListAsync()
-                    : await _context.Users.ToListAsync();
+                    ? await _context.Users
+                        .Where(u => u.StoreId == storeId.Value && u.IsActive == true)  // Filter by storeId and IsActive
+                        .ToListAsync()
+                    : await _context.Users
+                        .Where(u => u.IsActive == true)  // Fetch only active users when no storeId is provided
+                        .ToListAsync();
 
                 var userDtos = UserDto.Mapping(users);
                 return Ok(userDtos);
@@ -47,11 +51,11 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> GetUserss()
         {
             try {
+                // Fetch only active users with role "User"
                 var users = await _context.Users
-                .Include(u => u.Store)
-                .Where(u => u.Role == "User")// Filter users by role
-
-                .ToListAsync();
+                    .Include(u => u.Store)               // Include related Store entity
+                    .Where(u => u.Role == "User" && u.IsActive == true)  // Filter for active users with role "User"
+                    .ToListAsync();
 
 
                 // Return the list of users
@@ -161,21 +165,30 @@ namespace ECommerce_Final_Demo.Controllers
                 return StatusCode(500, new { Message = "An error occurred while update the user." });
             }
         }
+
         [HttpDelete("deleteuser{userId:guid}")]
         //[Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
             try {
-                var user = await _context.Users.FindAsync(userId);
+                // Fetch the user from the database
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                // If user not found, return 404
                 if (user == null)
                 {
-                    return NotFound(new { Message = "User not found." });
+                    return NotFound("User not found.");
                 }
 
-                _context.Users.Remove(user);
+                // Mark the user as inactive (soft delete)
+                user.IsActive = false;               
+                user.UpdateDate = DateTime.UtcNow;
+
+               
                 await _context.SaveChangesAsync();
 
-                return Ok(new { Message = "User deleted successfully." });
+                // Return success response
+                return Ok(new { Message = "User has been soft deleted successfully." });
             }
             catch (Exception ex)
             {

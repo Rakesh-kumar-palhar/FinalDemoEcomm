@@ -122,7 +122,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                     var jwtToken = handler.ReadJwtToken(token);
                     var StoreId = jwtToken.Claims.FirstOrDefault(c => c.Type == "StoreId");
                     var role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role").Value;
-
+                    var nameid = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
                     // Create claims for the cookie
                     var claims = new List<Claim>
                           {
@@ -130,7 +130,8 @@ namespace ECommerce_Demo_Frontend.Controllers
                        
                           new Claim("Token", token),
                           new Claim("StoreId", StoreId.ToString()),
-                          new Claim(ClaimTypes.Role,role.ToString())
+                          new Claim(ClaimTypes.Role,role.ToString()),
+                         
                           };
 
 
@@ -149,11 +150,31 @@ namespace ECommerce_Demo_Frontend.Controllers
                     HttpContext.Session.SetString("UserSession", token);
                     return RedirectToAction("Deshboard", "UserDeshboard");
                 }
+                else
+                {
+                    // Capture the error message from the backend response
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
+
+                    if (jsonResponse != null && jsonResponse.ContainsKey("Message"))
+                    {
+                        // Add error message to the ModelState
+                        ModelState.AddModelError(string.Empty, jsonResponse["Message"]);
+                    }
+                    else
+                    {
+                        // Default error message if response is unexpected
+                        ModelState.AddModelError(string.Empty, "Login failed. Please try again.");
+                    }
+                }
+               
+
             }
             else
             {
                 ModelState.AddModelError("", "Invalid login attempt. Please try again.");
             }
+
             return View(model);
         }
 

@@ -97,9 +97,12 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> ListOrders()
         {
             try {
-                var orders = await _context.Orders
-                    .Include(o => o.User)   // Load related User entity
-                    .Include(o => o.Store)  // Load related Store entity
+                // Fetch only pending orders (where Status is false)
+                var pendingOrders = await _context.Orders
+                    .Where(o => o.Status == false)  // Filter for pending orders
+                    .Include(o => o.User)           // Load related User entity
+                    .Include(o => o.Store)
+                    // Load related Store entity
                     .Select(o => new OrderDto
                     {
                         OrderId = o.OrderId,
@@ -109,52 +112,40 @@ namespace ECommerce_Final_Demo.Controllers
                         StoreName = o.Store.Name,
                         OrderDate = o.OrderDate,
                         TotalAmount = o.TotalAmount,
-
                     })
                     .ToListAsync();
 
-                return Ok(orders);
+                return Ok(pendingOrders);
             }
             catch (Exception ex)
             {
                 await LogException(ex);
-                return StatusCode(500, new { Message = "An error occurred while retrieving order." });
+                return StatusCode(500, new { Message = "An error occurred while accept order." });
             }
         }
         [HttpPost("accept/{orderId}")]
         public async Task<IActionResult> AcceptOrder(Guid orderId)
         {
             try {
-                var order = await _context.Orders
-                    .Include(o => o.User)  // Load the related User entity
-                    .Include(o => o.Store) // Load the related Store entity
+                var order = await _context.Orders.Include(o => o.OrderItems)
+                    .Include(o => o.Store)
+                    .Include(o => o.User)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
+                
                 if (order == null)
                 {
                     return NotFound("Order not found.");
                 }
-
+                order.Status = true;
                 var bill = GenerateBill(order);
-
-                // Create a response object with order details
-                var response = new
-                {
-                    OrderId = order.OrderId,
-                    UserName = $"{order.User.FName} {order.User.LName}",
-                    StoreName = order.Store.Name,
-                    OrderDate = order.OrderDate,
-                    TotalAmount = order.TotalAmount
-                };
-
                 await _context.SaveChangesAsync();
-
-                return Ok(new { Message = "Order accepted and bill generated.", Bill = response });
+                return Ok(new { Message = "Order accepted and bill generated.", Bill = bill });
             }
             catch (Exception ex)
             {
                 await LogException(ex);
-                return StatusCode(500, new { Message = "An error occurred while accept order." });
+                return StatusCode(500, new { Message = "An error occurred while delete order." });
             }
         }
         private object GenerateBill(Order order)

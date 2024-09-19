@@ -19,8 +19,9 @@ namespace ECommerce_Final_Demo.Model
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "TotalAmount must be greater than zero.")]
-        public decimal TotalAmount { get; set; } 
+        public decimal TotalAmount { get; set; }
 
+        public bool Status { get; set; } = false;
         //Relationship
         [ForeignKey("UserId")]
         public User? User { get; set; }

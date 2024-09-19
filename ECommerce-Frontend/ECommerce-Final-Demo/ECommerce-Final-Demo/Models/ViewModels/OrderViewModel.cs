@@ -9,6 +9,7 @@
         public string UserName { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
+        public bool Status { get; set; }
 
 
         // Static method to map OrderViewModel to Order
@@ -23,8 +24,8 @@
                 UserId = viewModel.UserId,
                 UserName = viewModel.UserName,
                 OrderDate = viewModel.OrderDate,
-                TotalAmount = viewModel.TotalAmount
-               
+                TotalAmount = viewModel.TotalAmount,
+                  Status= viewModel.Status
             };
         }
     }
