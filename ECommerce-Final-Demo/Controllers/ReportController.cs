@@ -1,17 +1,22 @@
 ﻿using ECommerce_Final_Demo.Model;
 using ECommerce_Final_Demo.Model.DTO;
+using ECommerce_Final_Demo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "SuperAdmin,StoreAdmin")]
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public ReportController(ApplicationDbContext context)
+        private readonly ILoggerService _logger;
+        public ReportController(ApplicationDbContext context, ILoggerService logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet("DayByDayPurchase")]
@@ -47,22 +52,12 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while GetDayByDayPurchaseReport generate." });
             }
 
            
         }
-        private async Task LogException(Exception ex)
-        {
-            // Log the exception details to a database or file
-            var logger = new Logger
-            {
-                ExceptionType = ex.GetType().ToString(),
-                Message = ex.Message
-            };
-            _context.Loggers.Add(logger);
-            await _context.SaveChangesAsync();
-        }
+        
     }
 }

@@ -1,5 +1,7 @@
 ﻿using ECommerce_Final_Demo.Model;
 using ECommerce_Final_Demo.Model.DTO;
+using ECommerce_Final_Demo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,15 +12,17 @@ namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public CartController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+        private readonly ILoggerService _logger;
+        public CartController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, ILoggerService logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+            _logger = logger;
         }
 
         private Guid GetUserId()
@@ -34,23 +38,20 @@ namespace ECommerce_Final_Demo.Controllers
         }
 
         [HttpGet("items")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> GetCartItems()
         {
             try
             {
-                var userId = GetUserId();  // Get the authenticated user's ID
-
-                
+                var userId = GetUserId();                 
                 var userCart = await _context.Carts
-                    .Include(c => c.Items)  // Include the cart's items
+                    .Include(c => c.Items)  
                     .FirstOrDefaultAsync(c => c.UserId == userId);
 
                 if (userCart == null)
                 {
                     return NotFound("No cart found for the user.");
-                }
-
-                
+                }                
                 var cartItems = await _context.CartItems
                     .Where(ci => ci.CartId == userCart.Id)
                     .Include(ci => ci.Item)
@@ -73,12 +74,13 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception here if you have a logging service
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while retrieving cart items." });
             }
         }
 
         [HttpDelete("removeitem/{itemId:guid}")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> RemoveCartItem(Guid itemId)
         {
             try
@@ -109,12 +111,13 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception here if you have a logging service
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while removing the item from the cart." });
             }
         }
 
         [HttpPost("additem")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> AddItemToCart([FromBody] CartItemDto cartItemDto)
         {
             try
@@ -177,22 +180,12 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                
-                await LogException(ex);
+
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while adding/updating the item in the cart." });
             }
         }
 
-        private async Task LogException(Exception ex)
-        {
-            
-            var logger = new Logger
-            {
-                ExceptionType = ex.GetType().ToString(),
-                Message = ex.Message
-            };
-            _context.Loggers.Add(logger);
-            await _context.SaveChangesAsync();
-        }
+       
     }
 }

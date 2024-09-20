@@ -1,5 +1,6 @@
 ﻿using ECommerce_Final_Demo.Model;
 using ECommerce_Final_Demo.Model.DTO;
+using ECommerce_Final_Demo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,23 +13,26 @@ namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ItemController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
-        public ItemController(ApplicationDbContext context)
+        private readonly ILoggerService _logger;
+        public ItemController(ApplicationDbContext context, ILoggerService logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet("allItem")]
-        // [Authorize(Roles = "SuperAdmin")]
+        
         public async Task<IActionResult> GetItem()
         {
             try
             {
                 var items = await _context.Items
                     .Include(u => u.Store)
+                    .Where(i => !i.IsDelete)
                     .ToListAsync();
 
                 var itemDtos = ItemDto.Mapping(items);
@@ -37,19 +41,20 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while retrieving items." });
             }
         }
 
         [HttpGet("listofitem")]
-        // [Authorize]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin,User")]
         public async Task<IActionResult> GetItems(Guid storeId)
         {
             try
             {
                 var items = await _context.Items
                     .Where(i => i.StoreId == storeId)
+                    .Where(i => !i.IsDelete)
                     .ToListAsync();
 
                 if (items == null || !items.Any())
@@ -63,13 +68,13 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while retrieving items." });
             }
         }
 
         [HttpPost("additem")]
-        // [Authorize(Roles = "Super Admin, Store Admin")]
+         [Authorize(Roles = "SuperAdmin, StoreAdmin")]
         public async Task<IActionResult> AddItem([FromBody] ItemDto itemDto)
         {
             try
@@ -87,20 +92,20 @@ namespace ECommerce_Final_Demo.Controllers
                     return BadRequest(new { Message = "Store not found." });
                 }
 
-                _context.Items.Add(item);
+                
                 await _context.SaveChangesAsync();
 
                 return Ok(new { Message = "Item created successfully." });
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while adding the item." });
             }
         }
 
         [HttpPut("updateitem/{itemId:guid}")]
-        // [Authorize(Roles = "Super Admin, Store Admin")]
+        [Authorize(Roles = "SuperAdmin, StoreAdmin")]
         public async Task<IActionResult> UpdateItem(Guid itemId, [FromBody] ItemDto itemDto)
         {
             if (itemId != itemDto.Id)
@@ -135,13 +140,13 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while updating the item." });
             }
         }
 
         [HttpDelete("deleteitem/{itemId:guid}")]
-        // [Authorize(Roles = "Super Admin, Store Admin")]
+        [Authorize(Roles = "SuperAdmin, StoreAdmin")]
         public async Task<IActionResult> DeleteItem(Guid itemId)
         {
             try
@@ -153,19 +158,22 @@ namespace ECommerce_Final_Demo.Controllers
                     return NotFound(new { Message = "Item not found." });
                 }
 
-                _context.Items.Remove(item);
+               
+                item.IsDelete = true;
+                _context.Items.Update(item); 
                 await _context.SaveChangesAsync();
 
                 return Ok(new { Message = "Item deleted successfully." });
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while deleting the item." });
             }
         }
 
         [HttpGet("getdetailsbyid/{id:guid}")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<ActionResult<ItemDto>> GetItemById(Guid id)
         {
             try
@@ -184,44 +192,10 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while retrieving the item details." });
             }
         }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchItems([FromQuery] ItemFilterDto filterDto)
-        {
-            try
-            {
-                var query = _context.Items.AsQueryable();
-
-                if (filterDto.Category.HasValue)
-                {
-                    query = query.Where(i => i.Type == filterDto.Category.Value);
-                }
-
-                var items = await query.ToListAsync();
-
-                return Ok(items);
-            }
-            catch (Exception ex)
-            {
-                await LogException(ex);
-                return StatusCode(500, new { Message = "An error occurred while searching for items." });
-            }
-        }
-
-        private async Task LogException(Exception ex)
-        {
-            // Log the exception details to a database or file
-            var logger = new Logger
-            {
-                ExceptionType = ex.GetType().ToString(),
-                Message = ex.Message
-            };
-            _context.Loggers.Add(logger);
-            await _context.SaveChangesAsync();
-        }
+       
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ECommerce_Final_Demo.Model;
 using ECommerce_Final_Demo.Model.DTO;
+using ECommerce_Final_Demo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,15 +11,17 @@ namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   //[Authorize]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public OrderController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+        private readonly ILoggerService _logger;
+        public OrderController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, ILoggerService logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+            _logger = logger;
         }
 
         private Guid GetUserId()
@@ -32,7 +35,9 @@ namespace ECommerce_Final_Demo.Controllers
 
             return Guid.Parse(userIdString);
         }
+        
         [HttpPost("placeorder")]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderDto orderDto)
         {
             try
@@ -80,29 +85,30 @@ namespace ECommerce_Final_Demo.Controllers
                 _context.Orders.Add(order);
                 _context.OrderItems.AddRange(orderItems);
 
-                // Remove items from the cart after placing the order
+                
                 _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
 
                 return Ok("orderplaced succesfull");
-                //new { OrderId = order.OrderId, TotalAmount = order.TotalAmount }
+                
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while place order." });
             }
         }
+        
         [HttpGet("ListOrders")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> ListOrders()
         {
             try {
-                // Fetch only pending orders (where Status is false)
+                
                 var pendingOrders = await _context.Orders
-                    .Where(o => o.Status == false)  // Filter for pending orders
-                    .Include(o => o.User)           // Load related User entity
+                    .Where(o => o.Status == false)  
+                    .Include(o => o.User)           
                     .Include(o => o.Store)
-                    // Load related Store entity
                     .Select(o => new OrderDto
                     {
                         OrderId = o.OrderId,
@@ -119,11 +125,13 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while accept order." });
             }
         }
+
         [HttpPost("accept/{orderId}")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> AcceptOrder(Guid orderId)
         {
             try {
@@ -144,7 +152,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while delete order." });
             }
         }
@@ -161,6 +169,7 @@ namespace ECommerce_Final_Demo.Controllers
         }
 
         [HttpDelete("deleteorder/{orderId}")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> DeleteOrder(Guid orderId)
         {
             try {

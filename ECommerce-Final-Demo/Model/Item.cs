@@ -29,7 +29,7 @@ namespace ECommerce_Final_Demo.Model
             [Required]
             public string? Image { get; set; }
 
-            public bool IsDelete { get; set; } = true;
+            public bool IsDelete { get; set; } = false;
 
         //Relationship
            [Required]

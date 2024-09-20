@@ -3,6 +3,7 @@ using ECommerce_Final_Demo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -10,27 +11,29 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register scoped services
 builder.Services.AddScoped<JwtTokenServices>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddHttpContextAccessor();
-//database service provider
-var provider = builder.Services.BuildServiceProvider();
-var config = provider.GetRequiredService<IConfiguration>();
-builder.Services.AddDbContext<ApplicationDbContext>(item => item.UseSqlServer(config.GetConnectionString("dbcs")));
 
-// Clear existing logging providers
+// Register DbContext with configuration
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs"))
+);
+
+// Register HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
+// Configure logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-// Register the custom logger provider
-builder.Services.AddSingleton<ILoggerProvider, DatabaseLoggerProvider>(sp =>
-{
-    return new DatabaseLoggerProvider(() => sp.GetRequiredService<ApplicationDbContext>());
-});
 
-//confegure jwt authentication
+// Register the custom logger provider as Singleton
+builder.Services.AddScoped<ILoggerService, LoggerService>();
+
+// Configure JWT authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,13 +53,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Configure authorization policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("StoreAdmin"));
     options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
 });
-
 
 var app = builder.Build();
 
@@ -68,10 +71,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

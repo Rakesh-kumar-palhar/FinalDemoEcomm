@@ -4,6 +4,7 @@ using ECommerce_Final_Demo.Models;
 using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using static ECommerce_Final_Demo.Helper.StoreLocation;
@@ -32,7 +33,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}stores/allstores";
-
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -73,15 +74,14 @@ namespace ECommerce_Final_Demo.Controllers
             {
                 var httpClient = _httpClientFactory.CreateClient();
                 var url = $"{_baseUrl}stores/allstores";
-
+                
                 var response = await httpClient.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    // Log response content for debugging
-                    Console.WriteLine($"Response Content: {responseContent}");
+                    
 
                     var storeData = JsonSerializer.Deserialize<List<Store>>(responseContent, new JsonSerializerOptions
                     {
@@ -160,7 +160,7 @@ namespace ECommerce_Final_Demo.Controllers
 
                 var httpClient = _httpClientFactory.CreateClient();
                 var url = $"{_baseUrl}stores/addstore";
-
+                SetAuthorizationHeader(httpClient);
                 var response = await httpClient.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
@@ -177,6 +177,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}stores/storedetails{Id}";
+            SetAuthorizationHeader(httpClient);
 
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -218,7 +219,7 @@ namespace ECommerce_Final_Demo.Controllers
 
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}stores/updatestore{storeViewModel.Id}";
-
+            SetAuthorizationHeader(httpClient);
             var jsonContent = JsonSerializer.Serialize(storeData);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -239,7 +240,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}stores/{Id}"; // The API endpoint to delete the user
-
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.DeleteAsync(url);
 
             if (response.IsSuccessStatusCode)
@@ -251,5 +252,14 @@ namespace ECommerce_Final_Demo.Controllers
             return View("Error"); // Redirect to an error page or handle as needed
         }
 
+
+        private void SetAuthorizationHeader(HttpClient httpClient)
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+            if (!string.IsNullOrEmpty(token))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+        }
     }
 }

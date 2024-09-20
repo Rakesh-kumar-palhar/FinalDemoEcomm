@@ -1,6 +1,7 @@
 ﻿using ECommerce_Final_Demo.Models;
 using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using System.Text.Json;
 namespace ECommerce_Final_Demo.Controllers
 {
@@ -20,7 +21,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}Report/DayByDayPurchase";
-
+            SetAuthorizationHeader(httpClient);
             try
             {
                 var response = await httpClient.GetAsync(url);
@@ -45,6 +46,14 @@ namespace ECommerce_Final_Demo.Controllers
             {
                 // Handle exceptions (e.g., log the error)
                 return View("Error"); // You can create an Error view to handle this case
+            }
+        }
+        private void SetAuthorizationHeader(HttpClient httpClient)
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+            if (!string.IsNullOrEmpty(token))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
     }

@@ -3,82 +3,126 @@
 <h4>UserViewModel</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit"  enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
+    <div class="col-md-6">
+        <form asp-action="Edit" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+               
+                <input asp-for="Id" hidden />
+                
             </div>
-            <div class="form-group">
-                <label asp-for="FName" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="FName" class="form-label"></label>
                 <input asp-for="FName" class="form-control" />
                 <span asp-validation-for="FName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="LName" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="LName" class="form-label"></label>
                 <input asp-for="LName" class="form-control" />
                 <span asp-validation-for="LName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="MobileNumber" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="MobileNumber" class="form-label"></label>
                 <input asp-for="MobileNumber" class="form-control" />
                 <span asp-validation-for="MobileNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Role" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Role" class="form-label"></label>
                 <input asp-for="Role" class="form-control" />
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CreateDate" class="control-label"></label>
-                <input asp-for="CreateDate" class="form-control" />
+
+            <div class="mb-3">
+                <label asp-for="CreateDate" class="form-label"></label>
+                <input asp-for="CreateDate" class="form-control" readonly />
                 <span asp-validation-for="CreateDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UpdateDate" class="control-label"></label>
-                <input asp-for="UpdateDate" class="form-control" />
+
+            <div class="mb-3">
+                <label asp-for="UpdateDate" class="form-label"></label>
+                <input asp-for="UpdateDate" class="form-control" readonly />
                 <span asp-validation-for="UpdateDate" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" asp-for="IsActive" />
+                <label class="form-check-label" for="IsActive">
+                    @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
-            <div class="form-group">
-                <label asp-for="StoreId" class="control-label"></label>
-                <input asp-for="StoreId" class="form-control" />
+
+            <div class="mb-3">
+                <label asp-for="StoreId" class="form-label"></label>
+                <select asp-for="StoreId" class="form-control" id="storeDropdown">
+                    <option value="">Select Store</option>
+                </select>
                 <span asp-validation-for="StoreId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Profile" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Profile" class="form-label"></label>
                 <input asp-for="Profile" class="form-control" />
                 <span asp-validation-for="Profile" class="text-danger"></span>
             </div>
-             <div class="form-group">
-                <label asp-for="ProfileImage" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="ProfileImage" class="form-label"></label>
                 <input asp-for="ProfileImage" type="file" class="form-control" />
                 <span asp-validation-for="ProfileImage" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("GetStores", "Store")',
+                type: 'GET',
+                success: function (data) {
+                    var $storeDropdown = $('#storeDropdown');
+                    $storeDropdown.empty();
 
+                    $storeDropdown.append($('<option>', {
+                        value: '',
+                        text: 'Select Store'
+                    }));
+
+                    $.each(data, function (index, store) {
+                        $storeDropdown.append($('<option>', {
+                            value: store.id,
+                            text: store.name
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                    console.log("Status: " + status);
+                    console.log("Response: " + xhr.responseText);
+                    alert('Failed to load store data.');
+                }
+            });
+        });
+    </script>
+}

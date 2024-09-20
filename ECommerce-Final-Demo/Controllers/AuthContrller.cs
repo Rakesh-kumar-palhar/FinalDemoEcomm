@@ -15,12 +15,13 @@ namespace ECommerce_Final_Demo.Controllers
         private readonly ApplicationDbContext _context;
         private readonly JwtTokenServices _jwtTokenServices;
         private readonly IPasswordHasher<User> _passwordHasher;
-
-        public AuthController(ApplicationDbContext context, JwtTokenServices jwtTokenServices, IPasswordHasher<User> passwordHasher)
+        private readonly ILoggerService _logger;
+        public AuthController(ApplicationDbContext context, JwtTokenServices jwtTokenServices, IPasswordHasher<User> passwordHasher, ILoggerService logger)
         {
             _context = context;
             _jwtTokenServices = jwtTokenServices;
             _passwordHasher = passwordHasher;
+            _logger = logger;
         }
 
         [HttpPost("register")]
@@ -58,7 +59,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred during registration." });
             }
         }
@@ -95,7 +96,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred during login." });
             }
         }
@@ -128,22 +129,11 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred during logout." });
             }
         }
 
-        private async Task LogException(Exception ex)
-        {
-            var logger = new Logger
-            {
-                ExceptionType = ex.GetType().ToString(),
-                Message = ex.Message,
-                Timestamp = DateTime.UtcNow
-            };
-
-            _context.Loggers.Add(logger);
-            await _context.SaveChangesAsync();
-        }
+       
     }
 }

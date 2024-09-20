@@ -20,8 +20,8 @@ namespace ECommerce_Final_Demo.Model.DTO
         public string Image { get; set; } = null!;
 
         public string? StoreName { get; set; }
-        public Guid StoreId { get; set; } 
-
+        public Guid StoreId { get; set; }
+        public bool IsDelete { get; set; }
         // Mapping from Item to ItemDto
         public static ItemDto Mapping(Item item)
         {
@@ -33,7 +33,8 @@ namespace ECommerce_Final_Demo.Model.DTO
                 Price = item.Price,
                 Image = item.Image,
                 StoreName = item.Store?.Name,
-                StoreId = item.StoreId ?? Guid.Empty // Use Guid.Empty if StoreId is null
+                StoreId = item.StoreId ?? Guid.Empty,// Use Guid.Empty if StoreId is null
+                IsDelete = item.IsDelete
             };
         }
 
@@ -58,7 +59,8 @@ namespace ECommerce_Final_Demo.Model.DTO
                 Type = (Item.Category)itemDto.Category, // Mapping from ItemDto's Category to Item's Category
                 Price = itemDto.Price,
                 Image = itemDto.Image,
-                StoreId = itemDto.StoreId
+                StoreId = itemDto.StoreId,
+                IsDelete = itemDto.IsDelete
             };
         }
 

@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using ECommerce_Final_Demo.FileUpload;
+using NuGet.Common;
+using System.Net.Http.Headers;
 
 namespace ECommerce_Final_Demo.Controllers
 {
@@ -28,8 +30,8 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-            // API endpoint to fetch all users
             var url = $"{_baseUrl}User/allusers"; 
+            SetAuthorizationHeader(httpClient);
 
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -40,9 +42,7 @@ namespace ECommerce_Final_Demo.Controllers
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
                 });
-                //var userViewModels = users.Select(User.ToViewModel).ToList();
-
-                // Manual mapping
+                
                 var userViewModels = new List<UserViewModel>();
                 foreach (var user in users)
                 {
@@ -60,7 +60,7 @@ namespace ECommerce_Final_Demo.Controllers
                         Profile = user.Profile,
                         StoreId = user.StoreId,
                         StoreName= user.StoreName
-                        // If needed, map other properties here
+                        
                     };
                     userViewModels.Add(userViewModel);
                 }
@@ -77,7 +77,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-
+            SetAuthorizationHeader(httpClient);
             var url = $"{_baseUrl}User/getbyid{Id}";
 
             var response = await httpClient.GetAsync(url);
@@ -105,25 +105,26 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-
-            var url = $"{_baseUrl}User/deleteuser{Id}"; // The API endpoint to delete the user
+            SetAuthorizationHeader(httpClient);
+            var url = $"{_baseUrl}User/deleteuser{Id}"; 
 
             var response = await httpClient.DeleteAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
               
-                return RedirectToAction("StoreUsers"); // Redirect back to the user list after deletion
+                return RedirectToAction("StoreUsers");
             }
 
             ModelState.AddModelError("", "Unable to delete user. Please try again.");
-            return View("Error"); // Redirect to an error page or handle as needed
+            return View("Error"); 
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
+            SetAuthorizationHeader(httpClient);
             var url = $"{_baseUrl}User/getbyid{Id}";
 
             var response = await httpClient.GetAsync(url);
@@ -168,6 +169,7 @@ namespace ECommerce_Final_Demo.Controllers
             };
 
             var httpClient = _httpClientFactory.CreateClient();
+            SetAuthorizationHeader(httpClient);
             var url = $"{_baseUrl}User/UpdateUser/{userViewModel.Id}";
 
             var jsonContent = JsonSerializer.Serialize(userData);
@@ -224,6 +226,7 @@ namespace ECommerce_Final_Demo.Controllers
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var httpClient = _httpClientFactory.CreateClient();
+                SetAuthorizationHeader(httpClient);
                 var url = $"{_baseUrl}User/createuser";
 
                 var response = await httpClient.PostAsync(url, content);
@@ -242,6 +245,13 @@ namespace ECommerce_Final_Demo.Controllers
             return View(userViewModel);
         }
 
-
+        private void SetAuthorizationHeader(HttpClient httpClient)
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+            if (!string.IsNullOrEmpty(token))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+        }
     }
 }

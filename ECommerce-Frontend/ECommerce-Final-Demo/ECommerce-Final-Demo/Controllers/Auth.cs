@@ -131,7 +131,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                           new Claim("Token", token),
                           new Claim("StoreId", StoreId.ToString()),
                           new Claim(ClaimTypes.Role,role.ToString()),
-                         
+                        new Claim(ClaimTypes.NameIdentifier, nameid .ToString())
                           };
 
 

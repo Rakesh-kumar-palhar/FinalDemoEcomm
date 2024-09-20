@@ -28,7 +28,7 @@ namespace ECommerce_Final_Demo.Models
 
         public string? StoreName { get; set; }
         public Guid StoreId { get; set; }
-
+        
 
         // Mapping from Item to ItemViewModel
         public static ItemViewModel ToViewModel(Item item)

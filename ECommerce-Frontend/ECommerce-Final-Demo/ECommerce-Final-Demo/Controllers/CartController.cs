@@ -1,5 +1,7 @@
 ﻿using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -70,6 +72,7 @@ namespace ECommerce_Final_Demo.Controllers
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var getCartItemsUrl = $"{_baseUrl}Cart/items";
+
             var response = await client.GetAsync(getCartItemsUrl);
 
             if (!response.IsSuccessStatusCode)
@@ -96,28 +99,28 @@ namespace ECommerce_Final_Demo.Controllers
 
             var client = _httpClientFactory.CreateClient();
 
-            // Set the authorization header
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            // Define the URL for removing the item
+            
             var removeItemUrl = $"{_baseUrl}Cart/removeitem/{itemId}";
-
-            // Send the DELETE request
+           
+            
             var response = await client.DeleteAsync(removeItemUrl);
 
             if (response.IsSuccessStatusCode)
             {
-                // Set success message in TempData
+               
                 TempData["SuccessMessage"] = "Item removed from cart successfully.";
             }
             else
             {
-                // Set error message in TempData
+               
                 TempData["ErrorMessage"] = "Error removing item from cart: " + response.ReasonPhrase;
             }
 
             // Redirect to the CartItems action to refresh the cart view
             return RedirectToAction("CartItems", "Cart");
         }
+       
     }
 }

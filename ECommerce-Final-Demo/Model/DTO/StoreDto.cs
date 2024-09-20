@@ -8,7 +8,7 @@
         public  int StateId { get; set; }
         public  int CityId { get; set; }
         public string? Image { get; set; }
-
+        public bool IsDelete { get; set; }
         public static StoreDto Mapping(Store store)
         {
             return new StoreDto
@@ -18,7 +18,8 @@
                 CountryId = store.CountryId,
                 StateId = store.StateId,
                 CityId = store.CityId,
-                Image = store.Image
+                Image = store.Image,
+                IsDelete = store.IsDelete
             };
         }
 
@@ -41,8 +42,8 @@
                 CountryId = storeDto.CountryId,
                 StateId = storeDto.StateId,
                 CityId = storeDto.CityId,
-                Image = storeDto.Image
-
+                Image = storeDto.Image,
+                IsDelete= storeDto.IsDelete
             };
         }
         public static List<Store> Mapping(List<StoreDto> StoreDto)

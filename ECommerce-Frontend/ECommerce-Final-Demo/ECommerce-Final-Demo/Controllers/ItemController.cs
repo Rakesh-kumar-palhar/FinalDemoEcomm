@@ -3,6 +3,7 @@ using ECommerce_Final_Demo.Models;
 using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -53,8 +54,9 @@ namespace ECommerce_Final_Demo.Controllers
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var httpClient = _httpClientFactory.CreateClient();
+                
                 var url = $"{_baseUrl}Item/additem";
-
+                SetAuthorizationHeader(httpClient);
                 var response = await httpClient.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
@@ -71,10 +73,8 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> StoreItems()
         {
             var httpClient = _httpClientFactory.CreateClient();
-
-            // API endpoint to fetch all users
-            var url = $"{_baseUrl}Item/allItem"; // Adjust the endpoint as necessary
-
+            var url = $"{_baseUrl}Item/allItem";            
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -96,8 +96,9 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-
+            
             var url = $"{_baseUrl}Item/getdetailsbyid{Id}";
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -119,8 +120,9 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Delete(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
+            
             var url = $"{_baseUrl}Item/deleteitem/{Id}"; // The API endpoint to delete the user
-
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.DeleteAsync(url);
 
             if (response.IsSuccessStatusCode)
@@ -136,8 +138,9 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Edit(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
+            
             var url = $"{_baseUrl}Item/getdetailsbyid/{Id}";
-
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -179,8 +182,9 @@ namespace ECommerce_Final_Demo.Controllers
                 Image = imagePath // Use the new image or the existing one
             };
             var httpClient = _httpClientFactory.CreateClient();
+           
             var url = $"{_baseUrl}Item/updateitem/{ItemViewModel.Id}";
-
+            SetAuthorizationHeader(httpClient);
             var jsonContent = JsonSerializer.Serialize(itemData);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -199,17 +203,18 @@ namespace ECommerce_Final_Demo.Controllers
 
         public async Task<IActionResult> GetStoreItems()
         {
-            // Step 1: Extract StoreId from token
+            
             var storeId = GetStoreIdFromToken();
             if (string.IsNullOrEmpty(storeId))
             {
                 return Unauthorized("StoreId not found in token.");
             }
 
-            // Step 2: Call the API to get store-specific items
+            
             var httpClient = _httpClientFactory.CreateClient();
+            
             var url = $"{_baseUrl}Item/listofitem?storeId={storeId}"; // Corrected API URL
-
+            SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
@@ -250,6 +255,14 @@ namespace ECommerce_Final_Demo.Controllers
             var storeIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "StoreId");
 
             return storeIdClaim?.Value; // Return StoreId or null
+        }
+        private void SetAuthorizationHeader(HttpClient httpClient)
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+            if (!string.IsNullOrEmpty(token))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
         }
     }
 }

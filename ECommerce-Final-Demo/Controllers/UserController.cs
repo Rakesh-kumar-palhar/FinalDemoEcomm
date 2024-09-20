@@ -1,5 +1,6 @@
 ﻿using ECommerce_Final_Demo.Model;
 using ECommerce_Final_Demo.Model.DTO;
+using ECommerce_Final_Demo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,30 +12,31 @@ namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(Roles = "SuperAdmin,StoreAdmin")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
-
-        public UserController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher)
+        private readonly ILoggerService _logger;
+        public UserController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher, ILoggerService logger)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _logger = logger;
         }
 
         [HttpGet("alluser")]
-        // [Authorize(Roles = "SuperAdmin ")]
+       [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> GetUsers([FromQuery] Guid? storeId)
         {
             try {
-                // Fetch only active users and apply storeId filter if provided
+                
                 var users = storeId.HasValue
                     ? await _context.Users
-                        .Where(u => u.StoreId == storeId.Value && u.IsActive == true)  // Filter by storeId and IsActive
+                        .Where(u => u.StoreId == storeId.Value && u.IsActive == true)  
                         .ToListAsync()
                     : await _context.Users
-                        .Where(u => u.IsActive == true)  // Fetch only active users when no storeId is provided
+                        .Where(u => u.IsActive == true)  
                         .ToListAsync();
 
                 var userDtos = UserDto.Mapping(users);
@@ -42,32 +44,30 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
-                return StatusCode(500, new { Message = "An error occurred while get the user." });
+                _logger.Log(ex); 
+                return StatusCode(500, "An error occurred while getuser.");
             }
         }
         [HttpGet("allusers")]
-        // [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> GetUserss()
         {
             try {
-                // Fetch only active users with role "User"
+                
                 var users = await _context.Users
-                    .Include(u => u.Store)               // Include related Store entity
-                    .Where(u => u.Role == "User" && u.IsActive == true)  // Filter for active users with role "User"
-                    .ToListAsync();
-
-
-                // Return the list of users
+                    .Include(u => u.Store)              
+                    .Where(u => u.Role == "User" && u.IsActive == true)  
+                    .ToListAsync();                
                 var userDtos = UserDto.Mapping(users);
                 return Ok(userDtos);
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while get the users." });
             }
         }
+        [Authorize(Roles = "SuperAdmin,StoreAdmin,User")]
         [HttpGet("getbyid{userId:guid}")]
         public async Task<IActionResult> GetUser(Guid userId)
         {
@@ -83,12 +83,12 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while get user by id." });
             }
         }
         [HttpPost("createuser")]
-        //[Authorize(Roles = "StoreAdmin ")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
         {
             try {
@@ -119,12 +119,13 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while create user." });
             }
         }
+
         [HttpPut("UpdateUser/{userId:guid}")]
-        //[Authorize(Roles = "SuperAdmin,StoreAdmin")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin,User")]
         public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UserDto userDto)
         {
             try {
@@ -150,8 +151,7 @@ namespace ECommerce_Final_Demo.Controllers
                 existingUser.IsActive = userDto.IsActive;
                 existingUser.Profile = userDto.Profile;
                 existingUser.StoreId = userDto.StoreId;
-                //existingUser.CreatedBy = userDto.CreatedBy;
-                //existingUser.UpdatedBy = userDto.UpdatedBy;
+               
                 existingUser.Token = userDto.Token;
 
                 _context.Users.Update(existingUser);
@@ -161,13 +161,13 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex); 
                 return StatusCode(500, new { Message = "An error occurred while update the user." });
             }
         }
 
         [HttpDelete("deleteuser{userId:guid}")]
-        //[Authorize(Roles = "SuperAdmin,StoreAdmin")]
+        [Authorize(Roles = "SuperAdmin,StoreAdmin")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
             try {
@@ -192,20 +192,10 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.Log(ex);
                 return StatusCode(500, new { Message = "An error occurred while delete the user." });
             }
         }
-        private async Task LogException(Exception ex)
-        {
-            // Log the exception details to a database or file
-            var logger = new Logger
-            {
-                ExceptionType = ex.GetType().ToString(),
-                Message = ex.Message
-            };
-            _context.Loggers.Add(logger);
-            await _context.SaveChangesAsync();
-        }
+       
     }
 }

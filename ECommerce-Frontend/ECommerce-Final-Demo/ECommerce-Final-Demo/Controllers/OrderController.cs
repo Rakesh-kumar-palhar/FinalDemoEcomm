@@ -1,12 +1,15 @@
 ﻿using ECommerce_Final_Demo.Models;
 using ECommerce_Final_Demo.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
 namespace ECommerce_Final_Demo.Controllers
 {
+    
     public class OrderController : Controller
     {
         private readonly string _baseUrl = "https://localhost:7171/api/";
@@ -21,7 +24,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}Order/ListOrders";  // The API endpoint
-
+            SetAuthorizationHeader(httpClient);
             try
             {
                 var response = await httpClient.GetAsync(url);
@@ -133,7 +136,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}Order/accept/{orderId}";  // The API endpoint
-
+            SetAuthorizationHeader(httpClient);
             try
             {
                 // Send a POST request to accept the order
@@ -176,7 +179,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}OrderApi/delete/{orderId}";
-
+            SetAuthorizationHeader(httpClient);
             try
             {
                 var response = await httpClient.DeleteAsync(url);
@@ -197,6 +200,14 @@ namespace ECommerce_Final_Demo.Controllers
             {
                 ViewBag.Message = $"An error occurred: {ex.Message}";
                 return View("Error"); // Handle error view or message
+            }
+        }
+        private void SetAuthorizationHeader(HttpClient httpClient)
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+            if (!string.IsNullOrEmpty(token))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
         }
     }
