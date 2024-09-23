@@ -18,7 +18,7 @@ namespace ECommerce_Final_Demo.Controllers
         private readonly string _baseUrl = "https://localhost:7171/api/";
         private readonly string _imageUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
         private readonly FileUploadService _fileUploadService;
-       
+
 
         public UserController(IHttpClientFactory httpClientFactory, FileUploadService fileUploadService)
         {
@@ -26,11 +26,11 @@ namespace ECommerce_Final_Demo.Controllers
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<IActionResult> StoreUsers()
+        public async Task<IActionResult> StoreUsers(int page = 1, int PageSize = 2)
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-            var url = $"{_baseUrl}User/allusers"; 
+            var url = $"{_baseUrl}User/allusers";
             SetAuthorizationHeader(httpClient);
 
             var response = await httpClient.GetAsync(url);
@@ -38,19 +38,20 @@ namespace ECommerce_Final_Demo.Controllers
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
 
+
                 var users = JsonSerializer.Deserialize<List<User>>(responseContent, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
-                
+
                 var userViewModels = new List<UserViewModel>();
                 foreach (var user in users)
                 {
                     var userViewModel = new UserViewModel
                     {
                         Id = user.Id,
-                        FName = user.FName,
-                        LName = user.LName,
+                        FirstName = user.FName,
+                        LastName = user.LName,
                         Email = user.Email,
                         MobileNumber = user.MobileNumber,
                         Role = user.Role,
@@ -59,15 +60,33 @@ namespace ECommerce_Final_Demo.Controllers
                         IsActive = user.IsActive,
                         Profile = user.Profile,
                         StoreId = user.StoreId,
-                        StoreName= user.StoreName
-                        
+                        StoreName = user.StoreName
+
                     };
                     userViewModels.Add(userViewModel);
                 }
 
-                return View(userViewModels);
-                
-                
+                var totallCount = userViewModels.Count;
+                var paginateusers = userViewModels
+                    .Skip((page - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList();
+
+                var viewModel = new UserListViewModel
+                {
+                    Users = paginateusers,
+                    PageInfo = new PageInfo
+                    {
+                        CurrentPage = page,
+                        TotalItems = totallCount,
+                        ItemPerPage = PageSize
+                    }
+
+                };
+
+                return View(viewModel);
+
+
             }
             return Json(new { error = "An error occurred while processing your request." });
         }
@@ -89,7 +108,7 @@ namespace ECommerce_Final_Demo.Controllers
 
                 var user = JsonSerializer.Deserialize<User>(responseContent, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
                 // Pass the user data to the view
@@ -106,18 +125,18 @@ namespace ECommerce_Final_Demo.Controllers
             var httpClient = _httpClientFactory.CreateClient();
 
             SetAuthorizationHeader(httpClient);
-            var url = $"{_baseUrl}User/deleteuser{Id}"; 
+            var url = $"{_baseUrl}User/deleteuser{Id}";
 
             var response = await httpClient.DeleteAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
-              
+
                 return RedirectToAction("StoreUsers");
             }
 
             ModelState.AddModelError("", "Unable to delete user. Please try again.");
-            return View("Error"); 
+            return View("Error");
         }
 
         [HttpGet]
@@ -154,8 +173,8 @@ namespace ECommerce_Final_Demo.Controllers
             var userData = new
             {
                 userViewModel.Id,
-                userViewModel.FName,
-                userViewModel.LName,
+                FName = userViewModel.FirstName, 
+                LName = userViewModel.LastName,  
                 userViewModel.Email,
                 userViewModel.MobileNumber,
                 userViewModel.Role,
@@ -164,8 +183,7 @@ namespace ECommerce_Final_Demo.Controllers
                 userViewModel.IsActive,
                 userViewModel.Password,
                 userViewModel.StoreId,
-
-                Profile = imagePath // Use the new image or the existing one
+                Profile = imagePath 
             };
 
             var httpClient = _httpClientFactory.CreateClient();
@@ -210,18 +228,20 @@ namespace ECommerce_Final_Demo.Controllers
                 }
                 var userData = new
                 {
-                    userViewModel.FName,
-                    userViewModel.LName,
-                    userViewModel.Email,
-                    userViewModel.Password,
-                    userViewModel.MobileNumber,
-                    userViewModel.Role,
-                    userViewModel.CreateDate,
-                    userViewModel.UpdateDate,
-                    userViewModel.IsActive,
-                    userViewModel.StoreId,
-                    Profile = imagePath // Profile will store the file name (not full path)
+                    id = userViewModel.Id, 
+                    fName = userViewModel.FirstName,
+                    lName = userViewModel.LastName,
+                    email = userViewModel.Email,
+                    password = userViewModel.Password,  
+                    mobileNumber = userViewModel.MobileNumber,
+                    role = userViewModel.Role,
+                    createDate = userViewModel.CreateDate,
+                    updateDate = userViewModel.UpdateDate,
+                    isActive = userViewModel.IsActive,
+                    profile = imagePath, // Pass the image file name or path (depending on your needs)
+                    storeId = userViewModel.StoreId
                 };
+
                 var json = JsonSerializer.Serialize(userData);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 

@@ -2,12 +2,7 @@
 
 namespace ECommerce_Final_Demo.Models.ViewModels
 {
-    public enum ItemCategory
-    {
-        Veg,
-        NonVeg,
-        Egg
-    }
+   
 
     public class ItemViewModel
     {

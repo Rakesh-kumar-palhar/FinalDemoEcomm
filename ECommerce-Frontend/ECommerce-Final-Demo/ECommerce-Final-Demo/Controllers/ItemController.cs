@@ -42,7 +42,7 @@ namespace ECommerce_Final_Demo.Controllers
                     imagePath = await _fileUploadService.UploadFileAsync(ItemViewModel.ImageFile, _imageUploadPath);
 
                 }
-                var userData = new
+                var ItemData = new
                 {
                     ItemViewModel.Name,
                     ItemViewModel.Category,
@@ -50,11 +50,11 @@ namespace ECommerce_Final_Demo.Controllers
                     ItemViewModel.StoreId,
                     Image = imagePath
                 };
-                var json = JsonSerializer.Serialize(userData);
+                var json = JsonSerializer.Serialize(ItemData);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var httpClient = _httpClientFactory.CreateClient();
-                
+
                 var url = $"{_baseUrl}Item/additem";
                 SetAuthorizationHeader(httpClient);
                 var response = await httpClient.PostAsync(url, content);
@@ -70,10 +70,10 @@ namespace ECommerce_Final_Demo.Controllers
             }
             return View();
         }
-        public async Task<IActionResult> StoreItems()
+        public async Task<IActionResult> StoreItems(string? category)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var url = $"{_baseUrl}Item/allItem";            
+            var url = $"{_baseUrl}Item/allItem";
             SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -85,6 +85,22 @@ namespace ECommerce_Final_Demo.Controllers
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use camelCase to match JSON property names
                 });
                 var ItemViewModels = Items.Select(Item.ToViewModel).ToList();
+                if (category == "Veg")
+                {
+                    ItemViewModels = Items.Where(i => i.Category == ItemCategory.Veg).Select(Item.ToViewModel).ToList();
+                    return PartialView("_itemPartialView", ItemViewModels);
+                }
+                if (category == "Non-Veg")
+                {
+                    ItemViewModels = Items.Where(i => i.Category == ItemCategory.NonVeg).Select(Item.ToViewModel).ToList();
+                    return PartialView("_itemPartialView", ItemViewModels);
+                }
+                if (category == "Egg")
+                {
+                    ItemViewModels = Items.Where(i => i.Category == ItemCategory.Egg).Select(Item.ToViewModel).ToList();
+                    return PartialView("_itemPartialView", ItemViewModels);
+                }
+
                 return View(ItemViewModels);
 
                 //return View(users);
@@ -96,7 +112,7 @@ namespace ECommerce_Final_Demo.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-            
+
             var url = $"{_baseUrl}Item/getdetailsbyid{Id}";
             SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
@@ -120,7 +136,7 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Delete(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            
+
             var url = $"{_baseUrl}Item/deleteitem/{Id}"; // The API endpoint to delete the user
             SetAuthorizationHeader(httpClient);
             var response = await httpClient.DeleteAsync(url);
@@ -138,7 +154,7 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> Edit(Guid Id)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            
+
             var url = $"{_baseUrl}Item/getdetailsbyid/{Id}";
             SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
@@ -182,7 +198,7 @@ namespace ECommerce_Final_Demo.Controllers
                 Image = imagePath // Use the new image or the existing one
             };
             var httpClient = _httpClientFactory.CreateClient();
-           
+
             var url = $"{_baseUrl}Item/updateitem/{ItemViewModel.Id}";
             SetAuthorizationHeader(httpClient);
             var jsonContent = JsonSerializer.Serialize(itemData);
@@ -203,16 +219,16 @@ namespace ECommerce_Final_Demo.Controllers
 
         public async Task<IActionResult> GetStoreItems()
         {
-            
+
             var storeId = GetStoreIdFromToken();
             if (string.IsNullOrEmpty(storeId))
             {
                 return Unauthorized("StoreId not found in token.");
             }
 
-            
+
             var httpClient = _httpClientFactory.CreateClient();
-            
+
             var url = $"{_baseUrl}Item/listofitem?storeId={storeId}"; // Corrected API URL
             SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
@@ -228,7 +244,7 @@ namespace ECommerce_Final_Demo.Controllers
                 var ItemViewModels = Items.Select(Item.ToViewModel).ToList();
                 return View(ItemViewModels);
 
-               
+
             }
             else
             {
@@ -237,6 +253,7 @@ namespace ECommerce_Final_Demo.Controllers
                 return View(); // Return the view with the error
             }
         }
+
 
         private string GetStoreIdFromToken()
         {

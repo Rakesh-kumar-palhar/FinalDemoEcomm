@@ -9,15 +9,15 @@
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                 <div class="mb-3">
-                    <label asp-for="FName" class="form-label"></label>
-                    <input asp-for="FName" class="form-control" />
-                    <span asp-validation-for="FName" class="text-danger"></span>
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="LName" class="form-label"></label>
-                    <input asp-for="LName" class="form-control" />
-                    <span asp-validation-for="LName" class="text-danger"></span>
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
@@ -32,17 +32,17 @@
                     <span asp-validation-for="MobileNumber" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
+                 <div class="mb-3">
                     <label asp-for="Role" class="form-label"></label>
                     <input asp-for="Role" class="form-control" />
                     <span asp-validation-for="Role" class="text-danger"></span>
-                </div>
+                </div> 
 
-                <div class="mb-3">
+                 <div class="mb-3">
                     <label asp-for="CreateDate" class="form-label"></label>
                     <input asp-for="CreateDate" class="form-control" />
                     <span asp-validation-for="CreateDate" class="text-danger"></span>
-                </div>
+                </div> 
 
                 <div class="mb-3">
                     <label asp-for="ProfileImage" class="form-label"></label>
@@ -53,10 +53,10 @@
                 <div class="form-check mb-3">
                     <input class="form-check-input" asp-for="IsActive" />
                     <label class="form-check-label" for="IsActive">@Html.DisplayNameFor(model => model.IsActive)</label>
-                </div>
+                </div> 
 
                 <div class="mb-3">
-                    <label asp-for="StoreId" class="form-label"></label>
+                    <label asp-for="StoreName" class="form-label"></label>
                     <select asp-for="StoreId" class="form-select" id="storeDropdown">
                         <option value="">Select Store</option>
                     </select>

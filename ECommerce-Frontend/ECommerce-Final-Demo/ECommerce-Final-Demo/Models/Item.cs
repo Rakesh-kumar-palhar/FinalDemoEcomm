@@ -37,7 +37,7 @@ namespace ECommerce_Final_Demo.Models
             {
                 Id = item.Id,
                 Name = item.Name,
-                Category = (ViewModels.ItemCategory)item.Category,
+                Category = item.Category,
                 Price = item.Price,
                 StoreId = item.StoreId,
                 ImageFile = null ,

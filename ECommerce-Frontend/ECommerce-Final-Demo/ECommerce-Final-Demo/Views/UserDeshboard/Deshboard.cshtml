@@ -1,9 +1,22 @@
-﻿@{
+﻿@* @{
     ViewBag.Title = "Deshboard";
     var role = ViewBag.Role as string;
+    var loginSuccessMessage = TempData["SuccessMessage"] as string;
 }
 
-
+@if (!string.IsNullOrEmpty(loginSuccessMessage))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast align-items-center text-bg-success border-0" id="loginToast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @loginSuccessMessage
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
 
 @if (role == "SuperAdmin")
 {
@@ -25,3 +38,82 @@ else
     <h3>Welcome to your dashboard</h3>
     <p>No specific actions available for your role.</p>
 }
+<script>
+    window.onload = function () {
+        var toastEl = document.getElementById('loginToast');
+        if (toastEl) {
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+    };
+</script>
+ *@
+
+
+@{
+    ViewBag.Title = "Dashboard";
+    var role = ViewBag.Role as string;
+    var loginSuccessMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string; // For error messages
+}
+
+@if (!string.IsNullOrEmpty(loginSuccessMessage))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast align-items-center text-bg-success border-0" id="loginToast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @loginSuccessMessage
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast align-items-center text-bg-danger border-0" id="errorToast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @errorMessage
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (role == "SuperAdmin")
+{
+    <h3>Welcome to Super Admin Dashboard</h3>
+}
+else if (role == "StoreAdmin")
+{
+    <h3>Welcome to Store Admin Dashboard</h3>
+}
+else if (role == "User")
+{
+    <h3>Welcome to User Dashboard</h3>
+}
+else
+{
+    <h3>Welcome to your dashboard</h3>
+    <p>No specific actions available for your role.</p>
+}
+
+<script>
+    window.onload = function () {
+        var successToast = document.getElementById('loginToast');
+        var errorToast = document.getElementById('errorToast');
+
+        if (successToast) {
+            var toast = new bootstrap.Toast(successToast);
+            toast.show();
+        }
+        if (errorToast) {
+            var toast = new bootstrap.Toast(errorToast);
+            toast.show();
+        }
+    };
+</script>

@@ -2,6 +2,8 @@
 using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Drawing.Printing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text;
@@ -23,7 +25,7 @@ namespace ECommerce_Final_Demo.Controllers
         public async Task<IActionResult> ListOrders()
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var url = $"{_baseUrl}Order/ListOrders";  // The API endpoint
+            var url = $"{_baseUrl}Order/ListOrders"; 
             SetAuthorizationHeader(httpClient);
             try
             {
@@ -32,14 +34,13 @@ namespace ECommerce_Final_Demo.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    // Deserialize into a list of orders
+                   
                     var orders = JsonSerializer.Deserialize<List<Order>>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     });
                     var ItemViewModels = orders.Select(Order.ToViewModel).ToList();
-
-                    return View(ItemViewModels);  // Pass the list of orders to the view
+                    return View(ItemViewModels);  
                 }
                 else
                 {
@@ -86,27 +87,27 @@ namespace ECommerce_Final_Demo.Controllers
 
             try
             {
-                // Send the POST request to the API
+               
                 var response = await client.PostAsync(orderurl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    // Handle success
+                    
                     ViewBag.Message = "Order placed successfully!";
-                    return View(); // Redirect or display success message
+                    return View();
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    // Handle error
+                    
                     ViewBag.ErrorMessage = "Oops! cart is empty" + errorMessage;
                     return View(); 
                 }
             }
             catch (HttpRequestException e)
             {
-                // Handle network errors
+               
                 ViewBag.ErrorMessage = "Network error: " + e.Message;
                 return View("Error");
             }
@@ -115,43 +116,43 @@ namespace ECommerce_Final_Demo.Controllers
 
         private string GetStoreIdFromToken()
         {
-            // Retrieve token from session
+            
             var token = HttpContext.Session.GetString("UserSession");
 
             if (string.IsNullOrEmpty(token))
             {
-                return null; // No token available
+                return null; 
             }
 
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
 
-            // Extract StoreId from token claims
+           
             var storeIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "StoreId");
 
-            return storeIdClaim?.Value; // Return StoreId or null
+            return storeIdClaim?.Value; 
         }
 
         public async Task<IActionResult> AcceptOrder(Guid orderId)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var url = $"{_baseUrl}Order/accept/{orderId}";  // The API endpoint
+            var url = $"{_baseUrl}Order/accept/{orderId}"; 
             SetAuthorizationHeader(httpClient);
             try
             {
-                // Send a POST request to accept the order
+                
                 var response = await httpClient.PostAsync(url, null);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Deserialize the response to get the message and bill
+                   
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var result = JsonSerializer.Deserialize<AcceptOrderResponse>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     });
 
-                    // Create a ViewModel to pass to the view
+                    
                     var viewModel = new AcceptOrderResponse
                     {
                         Message = result.Message,
@@ -186,20 +187,20 @@ namespace ECommerce_Final_Demo.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Optionally handle the response
+                   
                     ViewBag.Message = "Order deleted successfully.";
-                    return RedirectToAction("Index"); // Redirect to a list or index view
+                    return RedirectToAction("Index"); 
                 }
                 else
                 {
                     ViewBag.Message = "Failed to delete the order.";
-                    return View("Error"); // Handle error view or message
+                    return View("Error"); 
                 }
             }
             catch (Exception ex)
             {
                 ViewBag.Message = $"An error occurred: {ex.Message}";
-                return View("Error"); // Handle error view or message
+                return View("Error"); 
             }
         }
         private void SetAuthorizationHeader(HttpClient httpClient)

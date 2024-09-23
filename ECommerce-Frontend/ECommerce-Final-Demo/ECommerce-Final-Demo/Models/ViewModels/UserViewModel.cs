@@ -8,9 +8,9 @@ namespace ECommerce_Final_Demo.Models.ViewModels
        
         public Guid Id { get; set; }
       
-        public string FName { get; set; } = null!;
+        public string FirstName { get; set; } = null!;
        
-        public string LName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
        
         
         
@@ -36,8 +36,8 @@ namespace ECommerce_Final_Demo.Models.ViewModels
             return new User
             {
                 Id = viewModel.Id,
-                FName = viewModel.FName,
-                LName = viewModel.LName,
+                FName = viewModel.FirstName,
+                LName = viewModel.LastName,
                 Email = viewModel.Email,
                 Password = viewModel.Password,
                 MobileNumber = viewModel.MobileNumber,

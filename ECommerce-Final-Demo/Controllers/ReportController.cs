@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "SuperAdmin,StoreAdmin")]
+    //[Authorize(Roles = "SuperAdmin,StoreAdmin")]
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -39,7 +39,7 @@ namespace ECommerce_Final_Demo.Controllers
                         TotalSales = g.Sum(o => o.OrderItems.Sum(oi => oi.Quantity * oi.Price)),
                         OrderItems = g.SelectMany(o => o.OrderItems.Select(oi => new OrderItemDto
                         {
-                            ItemId = oi.ItemId,
+                            ItemId = oi.ItemId,                           
                             Quantity = oi.Quantity,
                             Price = oi.Price,
 

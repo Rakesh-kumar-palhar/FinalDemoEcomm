@@ -27,8 +27,8 @@ namespace ECommerce_Final_Demo.Models
             return new UserViewModel
             {
                 Id = user.Id,
-                FName = user.FName,
-                LName = user.LName,
+                FirstName = user.FName,
+                LastName = user.LName,
                 Email = user.Email,
                 MobileNumber = user.MobileNumber,
                 Role = user.Role,

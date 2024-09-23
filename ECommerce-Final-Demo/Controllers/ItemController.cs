@@ -92,7 +92,7 @@ namespace ECommerce_Final_Demo.Controllers
                     return BadRequest(new { Message = "Store not found." });
                 }
 
-                
+                await _context.Items.AddAsync(item);
                 await _context.SaveChangesAsync();
 
                 return Ok(new { Message = "Item created successfully." });

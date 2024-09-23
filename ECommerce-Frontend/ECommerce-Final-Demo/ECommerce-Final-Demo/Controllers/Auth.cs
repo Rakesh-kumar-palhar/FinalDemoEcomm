@@ -69,13 +69,14 @@ namespace ECommerce_Demo_Frontend.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Handle successful response, redirect to a success page                                   
+                    // Handle successful response, redirect to a success page
+                    TempData["SuccessMessage"] = "Registration successful! Please log in.";
                     return RedirectToAction("Login");
                 }
                 else
                 {
-                   
-                    ModelState.AddModelError(string.Empty,"Registration failed.User Exist In this Email.");
+
+                    TempData["ErrorMessage"] = "Registration failed. User already exists with this email.";
 
                 }
             }
@@ -148,23 +149,18 @@ namespace ECommerce_Demo_Frontend.Controllers
                         });
 
                     HttpContext.Session.SetString("UserSession", token);
+                    TempData["SuccessMessage"] = "Login successful!";
                     return RedirectToAction("Deshboard", "UserDeshboard");
                 }
                 else
                 {
-                    // Capture the error message from the backend response
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var jsonResponse = JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
-
-                    if (jsonResponse != null && jsonResponse.ContainsKey("Message"))
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        // Add error message to the ModelState
-                        ModelState.AddModelError(string.Empty, jsonResponse["Message"]);
+                        ModelState.AddModelError("", "Invalid credentials. Please try again.");
                     }
-                    else
+                    else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
-                        // Default error message if response is unexpected
-                        ModelState.AddModelError(string.Empty, "Login failed. Please try again.");
+                        ModelState.AddModelError("", "User not registered. Please sign up first.");
                     }
                 }
                
@@ -199,20 +195,21 @@ namespace ECommerce_Demo_Frontend.Controllers
                     // Clear the session data
                     HttpContext.Session.Remove("UserSession");
 
-                    // Redirect to login page or any other page
+                   
+                    TempData["SuccessMessage"] = "Logout successful!";
                     return RedirectToAction("Login", "Auth");
                 }
                 else
                 {
                     // Handle failure response
-                    ViewBag.ErrorMessage = "Logout failed. Please try again.";
+                    TempData["SuccessMessage"] = "Logout Fail! Please log in.";
                     return View("Error");
                 }
             }
             catch (HttpRequestException e)
             {
                 // Handle network errors
-                ViewBag.ErrorMessage = "Network error: " + e.Message;
+                TempData["SuccessMessage"] = "Network error! Please log in.";
                 return View("Error");
             }
 

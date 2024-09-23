@@ -29,21 +29,22 @@ namespace ECommerce_Final_Demo.Controllers
             _storeLocation = storeLocation;
             
         }
-        public async Task<IActionResult> StoreList()
+        public async Task<IActionResult> StoreList(int page = 1, int pageSize = 2)
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}stores/allstores";
             SetAuthorizationHeader(httpClient);
             var response = await httpClient.GetAsync(url);
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var storeData = JsonSerializer.Deserialize<List<Store>>(responseContent, new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
-                // Manually map the data
+                // Map Store entities to StoreViewModels
                 var storeViewModels = new List<StoreViewModel>();
                 foreach (var store in storeData)
                 {
@@ -52,20 +53,42 @@ namespace ECommerce_Final_Demo.Controllers
                         Id = store.Id,
                         Name = store.Name,
                         Country = await _storeLocation.GetCountryNameAsync(store.CountryId),
-                        State = await _storeLocation.GetStateNameAsync(store.StateId),   
+                        State = await _storeLocation.GetStateNameAsync(store.StateId),
                         City = await _storeLocation.GetCityNameAsync(store.CityId),
                         Image = store.Image
                     };
-
                     storeViewModels.Add(storeViewModel);
                 }
-                return View(storeViewModels);
+
+                // Total item count
+                var totalCount = storeViewModels.Count;
+
+                // Apply pagination
+                var PaginatedStores = storeViewModels
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // Create the view model with pagination information
+                var viewModel = new StoreListViewModel
+                {
+                    Stores = PaginatedStores,
+                    PageInfo = new PageInfo
+                    {
+                        CurrentPage = page,
+                        TotalItems = totalCount,
+                        ItemPerPage = pageSize
+                    }
+                };
+
+                return View(viewModel);
             }
             else
-            {                
-                return View("Error"); 
+            {
+                return View("Error");
             }
         }
+
 
         //for dropdown 
         public async Task<IActionResult> GetStores()
