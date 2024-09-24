@@ -21,26 +21,8 @@ namespace ECommerce_Final_Demo.Models
 
 
 
-        // Static method to map User to UserViewModel
-        public static UserViewModel ToViewModel(User user)
-        {
-            return new UserViewModel
-            {
-                Id = user.Id,
-                FirstName = user.FName,
-                LastName = user.LName,
-                Email = user.Email,
-                MobileNumber = user.MobileNumber,
-                Role = user.Role,
-                CreateDate = user.CreateDate,
-                UpdateDate = user.UpdateDate,
-                IsActive = user.IsActive,
-                ProfileImage = null, 
-                Profile = user.Profile,
-                StoreId = user.StoreId,
-                StoreName = user.StoreName
-            };
-        }
+       
+        
 
     }
 }

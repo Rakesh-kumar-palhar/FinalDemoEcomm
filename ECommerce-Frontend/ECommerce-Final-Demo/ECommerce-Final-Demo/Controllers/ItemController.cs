@@ -70,7 +70,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             return View();
         }
-        public async Task<IActionResult> StoreItems(string? category)
+        public async Task<IActionResult> StoreItems()
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}Item/allItem";
@@ -85,25 +85,9 @@ namespace ECommerce_Final_Demo.Controllers
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use camelCase to match JSON property names
                 });
                 var ItemViewModels = Items.Select(Item.ToViewModel).ToList();
-                if (category == "Veg")
-                {
-                    ItemViewModels = Items.Where(i => i.Category == ItemCategory.Veg).Select(Item.ToViewModel).ToList();
-                    return PartialView("_itemPartialView", ItemViewModels);
-                }
-                if (category == "Non-Veg")
-                {
-                    ItemViewModels = Items.Where(i => i.Category == ItemCategory.NonVeg).Select(Item.ToViewModel).ToList();
-                    return PartialView("_itemPartialView", ItemViewModels);
-                }
-                if (category == "Egg")
-                {
-                    ItemViewModels = Items.Where(i => i.Category == ItemCategory.Egg).Select(Item.ToViewModel).ToList();
-                    return PartialView("_itemPartialView", ItemViewModels);
-                }
-
                 return View(ItemViewModels);
 
-                //return View(users);
+                
             }
             return Json(new { error = "An error occurred while processing your request." });
         }

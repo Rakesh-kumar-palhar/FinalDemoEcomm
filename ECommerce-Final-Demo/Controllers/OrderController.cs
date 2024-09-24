@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ECommerce_Final_Demo.Controllers
 {
@@ -16,8 +17,8 @@ namespace ECommerce_Final_Demo.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILoggerService _logger;
-        public OrderController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, ILoggerService logger)
+        private readonly ILogger<OrderController> _logger;
+        public OrderController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<OrderController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
@@ -94,7 +95,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while place order.");
                 return StatusCode(500, new { Message = "An error occurred while place order." });
             }
         }
@@ -125,7 +126,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while accept order.");
                 return StatusCode(500, new { Message = "An error occurred while accept order." });
             }
         }
@@ -152,7 +153,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while delete order.");
                 return StatusCode(500, new { Message = "An error occurred while delete order." });
             }
         }
@@ -188,21 +189,11 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                await LogException(ex);
+                _logger.LogError(ex, "An error occurred while delete order.");
                 return StatusCode(500, new { Message = "An error occurred while delete order." });
             }
         }
 
-        private async Task LogException(Exception ex)
-        {
-            // Log the exception details to a database or file
-            var logger = new Logger
-            {
-                ExceptionType = ex.GetType().ToString(),
-                Message = ex.Message
-            };
-            _context.Loggers.Add(logger);
-            await _context.SaveChangesAsync();
-        }
+       
     }
 }

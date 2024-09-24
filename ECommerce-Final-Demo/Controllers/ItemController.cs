@@ -17,8 +17,8 @@ namespace ECommerce_Final_Demo.Controllers
     public class ItemController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILoggerService _logger;
-        public ItemController(ApplicationDbContext context, ILoggerService logger)
+        private readonly ILogger<ItemController> _logger;
+        public ItemController(ApplicationDbContext context, ILogger<ItemController> logger)
         {
             _context = context;
             _logger = logger;
@@ -41,7 +41,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving items.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving items." });
             }
         }
@@ -68,7 +68,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving items.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving items." });
             }
         }
@@ -99,7 +99,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while adding the item.");
                 return StatusCode(500, new { Message = "An error occurred while adding the item." });
             }
         }
@@ -140,7 +140,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while updating the item.");
                 return StatusCode(500, new { Message = "An error occurred while updating the item." });
             }
         }
@@ -167,7 +167,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while deleting the item.");
                 return StatusCode(500, new { Message = "An error occurred while deleting the item." });
             }
         }
@@ -192,7 +192,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving the item details.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving the item details." });
             }
         }

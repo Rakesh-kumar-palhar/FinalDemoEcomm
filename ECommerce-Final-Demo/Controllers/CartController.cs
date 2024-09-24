@@ -17,8 +17,8 @@ namespace ECommerce_Final_Demo.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILoggerService _logger;
-        public CartController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, ILoggerService logger)
+        private readonly ILogger<CartController> _logger;
+        public CartController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<CartController> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
@@ -74,7 +74,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception here if you have a logging service
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred during get cartitem");
                 return StatusCode(500, new { Message = "An error occurred while retrieving cart items." });
             }
         }
@@ -111,7 +111,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception here if you have a logging service
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while removing the item from the cart.");
                 return StatusCode(500, new { Message = "An error occurred while removing the item from the cart." });
             }
         }
@@ -180,8 +180,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while adding/updating the item in the cart.");
                 return StatusCode(500, new { Message = "An error occurred while adding/updating the item in the cart." });
             }
         }

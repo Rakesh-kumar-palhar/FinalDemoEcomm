@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ECommerce_Final_Demo.Models;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace ECommerce_Demo_Frontend.Controllers
@@ -214,6 +215,45 @@ namespace ECommerce_Demo_Frontend.Controllers
             }
 
         }
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+                var url = $"{_baseUrl}Auth/change-password"; // Adjust this URL to match your API endpoint
+
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Retrieve the user's ID from claims
+
+                var requestData = new
+                {
+                    UserId = userId,
+                    currentPassword = model.CurrentPassword,
+                    newPassword = model.NewPassword
+                };
+
+                var response = await httpClient.PostAsJsonAsync(url, requestData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ViewBag.Message = "Password changed successfully.";
+                    return RedirectToAction("Login");
+                    return View(); // Optionally redirect or return a success message
+                }
+                else
+                {
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", "An error occurred while changing the password: " + errorResponse);
+                }
+            }
+
+            return View(model); // Return the view with validation errors if any
+        }
+
     }
 
 }

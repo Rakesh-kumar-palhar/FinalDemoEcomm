@@ -26,7 +26,7 @@ namespace ECommerce_Final_Demo.Controllers
             _fileUploadService = fileUploadService;
         }
 
-        public async Task<IActionResult> StoreUsers(int page = 1, int PageSize = 2)
+        public async Task<IActionResult> StoreUsers()
         {
             var httpClient = _httpClientFactory.CreateClient();
 
@@ -37,7 +37,6 @@ namespace ECommerce_Final_Demo.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-
 
                 var users = JsonSerializer.Deserialize<List<User>>(responseContent, new JsonSerializerOptions
                 {
@@ -60,36 +59,19 @@ namespace ECommerce_Final_Demo.Controllers
                         IsActive = user.IsActive,
                         Profile = user.Profile,
                         StoreId = user.StoreId,
-                        StoreName = user.StoreName
-
+                        StoreName = user.StoreName,
+                        Password = user.Password
                     };
                     userViewModels.Add(userViewModel);
                 }
 
-                var totallCount = userViewModels.Count;
-                var paginateusers = userViewModels
-                    .Skip((page - 1) * PageSize)
-                    .Take(PageSize)
-                    .ToList();
-
-                var viewModel = new UserListViewModel
-                {
-                    Users = paginateusers,
-                    PageInfo = new PageInfo
-                    {
-                        CurrentPage = page,
-                        TotalItems = totallCount,
-                        ItemPerPage = PageSize
-                    }
-
-                };
-
-                return View(viewModel);
-
-
+                
+                return View(userViewModels);
             }
+
             return Json(new { error = "An error occurred while processing your request." });
         }
+
 
 
         public async Task<IActionResult> Details(Guid Id)
@@ -149,8 +131,10 @@ namespace ECommerce_Final_Demo.Controllers
             var response = await httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var user = await response.Content.ReadFromJsonAsync<UserViewModel>();
-                return View(user);
+                var user = await response.Content.ReadFromJsonAsync<User>();
+                var userViewModel = UserViewModel.ToViewModel(user);
+                
+                return View(userViewModel);
             }
 
             ModelState.AddModelError("", "Unable to load user details. Please try again.");
@@ -206,6 +190,37 @@ namespace ECommerce_Final_Demo.Controllers
             return View(userViewModel);
         }
 
+        private static bool IsPasswordValid(string password)
+        {
+            // Check for null or empty
+            if (string.IsNullOrEmpty(password))
+                return false;
+
+            // Check for minimum length
+            if (password.Length < 8)
+                return false;
+
+            // Check for at least one uppercase letter, one lowercase letter, one number, and one special character
+            bool hasUpperCase = false;
+            bool hasLowerCase = false;
+            bool hasDigit = false;
+            bool hasSpecialChar = false;
+
+            // Define a set of special characters to check against
+            string specialChars = "@#$&*";
+
+            foreach (char c in password)
+            {
+                if (char.IsUpper(c)) hasUpperCase = true;
+                if (char.IsLower(c)) hasLowerCase = true;
+                if (char.IsDigit(c)) hasDigit = true;
+                if (specialChars.Contains(c)) hasSpecialChar = true;
+            }
+
+            // Password is valid only if it contains at least one of each category
+            return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+        }
+
         public IActionResult Create()
         {
             return View();
@@ -218,6 +233,11 @@ namespace ECommerce_Final_Demo.Controllers
 
             if (ModelState.IsValid)
             {
+                if (!IsPasswordValid(userViewModel.Password))
+                {
+                    ModelState.AddModelError("Password", "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character from @#$&*.");
+                    return View(userViewModel); // Return the view with the validation error
+                }
                 string imagePath = null;
 
                 if (userViewModel.ProfileImage != null && userViewModel.ProfileImage.Length > 0)

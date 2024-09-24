@@ -17,8 +17,8 @@ namespace ECommerce_Final_Demo.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
-        private readonly ILoggerService _logger;
-        public UserController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher, ILoggerService logger)
+        private readonly ILogger<UserController> _logger;
+        public UserController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher, ILogger<UserController> logger)
         {
             _context = context;
             _passwordHasher = passwordHasher;
@@ -44,7 +44,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex); 
+                _logger.LogError(ex, "An error occurred while getuser.");
                 return StatusCode(500, "An error occurred while getuser.");
             }
         }
@@ -63,7 +63,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while get the users.");
                 return StatusCode(500, new { Message = "An error occurred while get the users." });
             }
         }
@@ -83,7 +83,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while get user by id.");
                 return StatusCode(500, new { Message = "An error occurred while get user by id." });
             }
         }
@@ -119,7 +119,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while create user.");
                 return StatusCode(500, new { Message = "An error occurred while create user." });
             }
         }
@@ -161,7 +161,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex); 
+                _logger.LogError(ex, "An error occurred while update the user.");
                 return StatusCode(500, new { Message = "An error occurred while update the user." });
             }
         }
@@ -192,7 +192,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while delete the user.");
                 return StatusCode(500, new { Message = "An error occurred while delete the user." });
             }
         }

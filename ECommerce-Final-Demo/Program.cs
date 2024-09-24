@@ -26,12 +26,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Register HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
-// Configure logging
+//Configure Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-
-// Register the custom logger provider as Singleton
-builder.Services.AddScoped<ILoggerService, LoggerService>();
+builder.Services.AddSingleton<ILoggerProvider, DatabaseLoggerProvider>();
 
 // Configure JWT authentication
 builder.Services.AddAuthentication(options =>

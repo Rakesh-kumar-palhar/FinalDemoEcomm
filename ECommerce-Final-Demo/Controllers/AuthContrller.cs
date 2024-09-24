@@ -15,8 +15,8 @@ namespace ECommerce_Final_Demo.Controllers
         private readonly ApplicationDbContext _context;
         private readonly JwtTokenServices _jwtTokenServices;
         private readonly IPasswordHasher<User> _passwordHasher;
-        private readonly ILoggerService _logger;
-        public AuthController(ApplicationDbContext context, JwtTokenServices jwtTokenServices, IPasswordHasher<User> passwordHasher, ILoggerService logger)
+        private readonly ILogger <AuthController>_logger;
+        public AuthController(ApplicationDbContext context, JwtTokenServices jwtTokenServices, IPasswordHasher<User> passwordHasher, ILogger<AuthController> logger)
         {
             _context = context;
             _jwtTokenServices = jwtTokenServices;
@@ -32,12 +32,17 @@ namespace ECommerce_Final_Demo.Controllers
                 var existingUser = await _context.Users
                    .FirstOrDefaultAsync(u => u.Email == model.Email);
 
+                if (model.Email == "trigger500@example.com")
+                {
+                    throw new InvalidOperationException("This is a test to trigger a 500 error.");
+                }
+
                 if (existingUser != null)
                 {
                     return BadRequest(new { Message = "User with this email already exists." });
                 }
-              
-               var user = new User
+
+                var user = new User
                 {
                     Id = Guid.NewGuid(),
                     FName = model.FName,
@@ -59,7 +64,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred during registration for email: {Email}", model.Email);  // Logging the exception with relevant details
                 return StatusCode(500, new { Message = "An error occurred during registration." });
             }
         }
@@ -96,8 +101,8 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
-                return StatusCode(500, new { Message = "An error occurred during login." });
+                _logger.LogError(ex, "An error occurred during login for email: {Email}", model.Email);  // Logging the exception with relevant details
+                return StatusCode(500, new { Message = "An error occurred during Login." });
             }
         }
 
@@ -129,11 +134,44 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred during logout for email: {Email}");  // Logging the exception with relevant details
                 return StatusCode(500, new { Message = "An error occurred during logout." });
             }
         }
 
-       
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model)
+        {
+            try
+            {
+                // Fetch the user from the database
+                var user = await _context.Users.FindAsync(model.UserId);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found." });
+                }
+
+                // Validate the current password
+                var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, model.CurrentPassword);
+                if (passwordVerificationResult == PasswordVerificationResult.Failed)
+                {
+                    return BadRequest(new { Message = "Current password is incorrect." });
+                }
+
+                // Hash the new password
+                user.Password = _passwordHasher.HashPassword(user, model.NewPassword);
+
+                // Update the user in the database
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Password changed successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during change for password");  // Logging the exception with relevant details
+                return StatusCode(500, new { Message = "An error occurred during change password." });
+            }
+        }
     }
 }

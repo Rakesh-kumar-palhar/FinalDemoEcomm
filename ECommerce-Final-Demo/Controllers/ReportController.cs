@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce_Final_Demo.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize(Roles = "SuperAdmin,StoreAdmin")]
+    [Authorize(Roles = "SuperAdmin,StoreAdmin")]
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILoggerService _logger;
-        public ReportController(ApplicationDbContext context, ILoggerService logger)
+        private readonly ILogger<ReportController> _logger;
+        public ReportController(ApplicationDbContext context, ILogger<ReportController>logger)
         {
             _context = context;
             _logger = logger;
@@ -52,7 +52,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while GetDayByDayPurchaseReport generate.");
                 return StatusCode(500, new { Message = "An error occurred while GetDayByDayPurchaseReport generate." });
             }
 

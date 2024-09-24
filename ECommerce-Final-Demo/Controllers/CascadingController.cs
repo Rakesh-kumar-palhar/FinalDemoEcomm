@@ -13,8 +13,8 @@ namespace ECommerce_Final_Demo.Controllers
     public class CascadingController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILoggerService _logger;
-        public CascadingController(ApplicationDbContext context, ILoggerService logger)
+        private readonly ILogger<CascadingController> _logger;
+        public CascadingController(ApplicationDbContext context, ILogger<CascadingController> logger)
         {
             _context = context;
             _logger = logger;
@@ -31,7 +31,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving countries");
                 return StatusCode(500, new { Message = "An error occurred while retrieving countries." });
             }
         }
@@ -55,7 +55,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving states");
                 return StatusCode(500, new { Message = "An error occurred while retrieving states." });
             }
         }
@@ -79,7 +79,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving cities.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving cities." });
             }
         }
@@ -101,7 +101,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving the country.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving the country." });
             }
         }
@@ -123,7 +123,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving the state.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving the state." });
             }
         }
@@ -145,7 +145,7 @@ namespace ECommerce_Final_Demo.Controllers
             catch (Exception ex)
             {
                 // Log the exception
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while retrieving the city.");
                 return StatusCode(500, new { Message = "An error occurred while retrieving the city." });
             }
         }

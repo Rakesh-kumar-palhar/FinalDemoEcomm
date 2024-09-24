@@ -26,6 +26,9 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
+   
+
+
 </head>
 <body>
 
@@ -42,7 +45,12 @@
 
                         <form asp-action="Login" style="width: 23rem;">
                             <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Log in</h3>
-
+                            @if (!ViewData.ModelState.IsValid)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                </div>
+                            }
                             <div class="form-outline mb-4">
                                 <label asp-for="Email" class="form-label">Email address</label>
                                 <input asp-for="Email" class="form-control form-control-lg" />
@@ -74,3 +82,4 @@
 
 </body>
 </html>
+

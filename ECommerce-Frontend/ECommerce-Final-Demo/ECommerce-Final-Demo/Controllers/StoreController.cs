@@ -29,7 +29,7 @@ namespace ECommerce_Final_Demo.Controllers
             _storeLocation = storeLocation;
             
         }
-        public async Task<IActionResult> StoreList(int page = 1, int pageSize = 2)
+        public async Task<IActionResult> StoreList()
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"{_baseUrl}stores/allstores";
@@ -60,28 +60,9 @@ namespace ECommerce_Final_Demo.Controllers
                     storeViewModels.Add(storeViewModel);
                 }
 
-                // Total item count
-                var totalCount = storeViewModels.Count;
+                
 
-                // Apply pagination
-                var PaginatedStores = storeViewModels
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-
-                // Create the view model with pagination information
-                var viewModel = new StoreListViewModel
-                {
-                    Stores = PaginatedStores,
-                    PageInfo = new PageInfo
-                    {
-                        CurrentPage = page,
-                        TotalItems = totalCount,
-                        ItemPerPage = pageSize
-                    }
-                };
-
-                return View(viewModel);
+                return View(storeViewModels);
             }
             else
             {

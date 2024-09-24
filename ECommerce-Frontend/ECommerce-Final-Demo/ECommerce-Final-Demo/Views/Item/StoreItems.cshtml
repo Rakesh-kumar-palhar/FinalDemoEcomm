@@ -1,44 +1,47 @@
 ﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.ItemViewModel>
 
-<h3>Items List</h3>
+<h3>List of Items</h3>
 
+<!-- Button to create a new item -->
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create</a>
+    <a class="btn btn-primary" asp-action="Create">Create</a>
 </p>
-<select id="categoryId">
-    <option value="">Select Category</option>
-    <option value="Veg">Veg</option>
-    <option value="Non-Veg">Non-Veg</option>
-    <option value="Egg">Egg</option>
-</select>
 
-<div id="itemListContainer">
-    @Html.Partial("_itemPartialView", Model);
-</div>
+<!-- Items Table -->
+<table class="table table-bordered table-striped" id="Itemtable">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Category)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Price)</th>
+            <th>@Html.DisplayNameFor(model => model.First().StoreName)</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.StoreName)</td>
+                <td>
+                    <img src="@Url.Content("~/images/" + item.Image)" alt="Item Image" style="width:70px; height:auto;" />
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 @section Scripts {
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <script type="text/javascript">
+    <script>
         $(document).ready(function () {
-            $('#categoryId').change(function () {
-                var selectedCategory = $(this).val(); // Get the selected category
-
-                $.ajax({
-                    url: '@Url.Action("StoreItems", "Item")', // Controller action method to call
-                    type: 'GET',
-                    data: { category: selectedCategory }, // Data to send (category selected)
-                    success: function (result) {
-                        // Load the partial view returned by the controller into the itemListContainer div
-                        $('#itemListContainer').html(result);
-                    },
-                    error: function () {
-                        alert('Error while loading data.');
-                    }
-                });
-            });
+            $('#Itemtable').DataTable();
         });
     </script>
 }
-
-
- 

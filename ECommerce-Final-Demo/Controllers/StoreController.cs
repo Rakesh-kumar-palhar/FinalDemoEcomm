@@ -14,8 +14,8 @@ namespace ECommerce_Final_Demo.Controllers
     public class StoreController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILoggerService _logger;
-        public StoreController(ApplicationDbContext context, ILoggerService logger)
+        private readonly ILogger<StoreController> _logger;
+        public StoreController(ApplicationDbContext context,Logger<StoreController> logger)
         {
             _context = context;
             _logger = logger;
@@ -37,7 +37,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while fatch list of store.");
                 return StatusCode(500, new { Message = "An error occurred while fatch list of store." });
             }
         }
@@ -60,7 +60,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while add the store.");
                 return StatusCode(500, new { Message = "An error occurred while add the store." });
             }
         }
@@ -82,7 +82,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while fatch the storedetails.");
                 return StatusCode(500, new { Message = "An error occurred while fatch the storedetails." });
             }
         }   
@@ -111,7 +111,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while updating the store.");
                 return StatusCode(500, new { Message = "An error occurred while updating the store." });
             }
         }
@@ -137,7 +137,7 @@ namespace ECommerce_Final_Demo.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(ex);
+                _logger.LogError(ex, "An error occurred while delete the store.");
                 return StatusCode(500, new { Message = "An error occurred while delete the store." });
             }
         }
