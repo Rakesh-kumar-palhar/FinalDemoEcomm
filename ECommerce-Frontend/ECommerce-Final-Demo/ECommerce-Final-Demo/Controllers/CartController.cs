@@ -1,4 +1,5 @@
-﻿using ECommerce_Final_Demo.Models.ViewModels;
+﻿using ECommerce_Final_Demo.Models;
+using ECommerce_Final_Demo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -30,7 +31,7 @@ namespace ECommerce_Final_Demo.Controllers
             {
                 ItemId = id,
                 Price = price,
-                Quantity = quantity
+                Quantity = 1
             };
 
             var content = new StringContent(JsonSerializer.Serialize(cartData), Encoding.UTF8, "application/json");
@@ -121,6 +122,81 @@ namespace ECommerce_Final_Demo.Controllers
             // Redirect to the CartItems action to refresh the cart view
             return RedirectToAction("CartItems", "Cart");
         }
-       
+
+        [HttpPost]
+        public async Task<IActionResult> Remove(Guid id)
+        { 
+
+            var token = HttpContext.Session.GetString("UserSession");
+
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            // Set up the API URL to update the cart item quantity
+            var removeItemUrl = $"{_baseUrl}Cart/updateCartitem/quantity";
+
+            // Create the CartItemDto to send with the request
+            var cartItemDto = new AddToCart
+            {
+                ItemId = id,
+                Quantity = -1 // Decrease quantity by the specified amount
+            };
+
+            // Serialize the DTO to JSON
+            var jsonContent = new StringContent(JsonSerializer.Serialize(cartItemDto), Encoding.UTF8, "application/json");
+
+            // Send the PUT request
+            var response = await client.PutAsync(removeItemUrl, jsonContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Item quantity updated successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Error updating item quantity: " + response.ReasonPhrase;
+            }
+
+            // Redirect to the CartItems action to refresh the cart view
+            return RedirectToAction("CartItems", "Cart");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Add(Guid id)
+        {
+            var token = HttpContext.Session.GetString("UserSession");
+
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            // Set up the API URL to update the cart item quantity
+            var removeItemUrl = $"{_baseUrl}Cart/updateCartitem/quantity";
+
+            // Create the CartItemDto to send with the request
+            var cartItemDto = new AddToCart
+            {
+                ItemId = id,
+                Quantity = 1 // Decrease quantity by the specified amount
+            };
+
+            // Serialize the DTO to JSON
+            var jsonContent = new StringContent(JsonSerializer.Serialize(cartItemDto), Encoding.UTF8, "application/json");
+
+            // Send the PUT request
+            var response = await client.PutAsync(removeItemUrl, jsonContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Item quantity updated successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Error updating item quantity: " + response.ReasonPhrase;
+            }
+
+            // Redirect to the CartItems action to refresh the cart view
+            return RedirectToAction("CartItems", "Cart");
+        }
     }
 }

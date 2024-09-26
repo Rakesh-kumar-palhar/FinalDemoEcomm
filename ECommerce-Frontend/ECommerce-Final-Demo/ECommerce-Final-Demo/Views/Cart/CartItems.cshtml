@@ -52,8 +52,13 @@ else
                         @Html.DisplayFor(modelItem => item.Price)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Quantity)
+
+                        <button class="btn btn-success btn-sm add-to-cart" data-id="@item.ItemId">+</button>
+                        <span id="quantity-@item.ItemId">@Html.DisplayFor(modelItem => item.Quantity)</span>
+                        <button class="btn btn-danger btn-sm remove-from-cart" data-id="@item.ItemId">-</button>
+
                     </td>
+                    
                     <td>
                         <form asp-action="RemoveFromCart" method="post">
                             <input type="hidden" name="itemId" value="@item.ItemId" />
@@ -65,13 +70,53 @@ else
         </tbody>
     </table>
 }
+@using (Html.BeginForm("PlaceOrder", "Order", FormMethod.Post))
+{
+   @*  <!-- Hidden input to pass StoreId -->
+    @Html.Hidden("StoreId", Model.FirstOrDefault()?.StoreId)  *@
 
-@section Scripts{
+    <button type="submit" class="btn btn-success">Place Order</button>
+}
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        $(document).ready(function () {
+            $('.add-to-cart').click(function () {
+                var itemId = $(this).data('id');
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Add", "Cart")',
+                    data: { id: itemId },
+                    success: function (response) {
+                        
+                        window.location.href = 'CartItems'
+                        // Optionally, show a success message
+                        toastr.success("Item added to cart!", "Success");
+                    },
+                    error: function (xhr) {
+                        toastr.error("Error adding item to cart: " + xhr.responseText, "Error");
+                    }
+                });
+            });
 
-        function showremoveToCartAlert() {
-            toastr.success("The item is remove from your cart!", "Success");
-        }
+            $('.remove-from-cart').click(function () {
+                var itemId = $(this).data('id');
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Remove", "Cart")',
+                    data: { id: itemId },
+                    success: function (response) {
+                        window.location.href = 'CartItems'
+
+                        // Optionally, show a success message
+                        toastr.success("Item removed from cart!", "Success");
+                    },
+                    error: function (xhr) {
+                        toastr.error("Error removing item from cart: " + xhr.responseText, "Error");
+                    }
+                });
+            });
+        });
 
         // Optional: Customize Toastr options
         toastr.options = {
@@ -80,8 +125,6 @@ else
             "positionClass": "toast-top-right",
             "timeOut": "5000" // 5 seconds
         };
-
     </script>
 }
-
 

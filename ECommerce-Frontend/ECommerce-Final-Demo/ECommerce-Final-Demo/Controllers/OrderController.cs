@@ -93,23 +93,23 @@ namespace ECommerce_Final_Demo.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    
-                    ViewBag.Message = "Order placed successfully!";
-                    return View();
+
+                    TempData["SuccessMessage"] = "Order placed successfully!";
+                    return RedirectToAction("Deshboard", "UserDeshboard");
                 }
                 else
                 {
-                    var errorMessage = await response.Content.ReadAsStringAsync();
-                    
-                    ViewBag.ErrorMessage = "Oops! cart is empty" + errorMessage;
-                    return View(); 
+
+
+                    TempData["errorMessage"] = "Oops ! your cart is empty";
+                    return RedirectToAction("Deshboard", "UserDeshboard");
                 }
             }
             catch (HttpRequestException e)
             {
-               
-                ViewBag.ErrorMessage = "Network error: " + e.Message;
-                return View("Error");
+
+                TempData["errorMessage"] = "Oops ! network error";
+                return RedirectToAction("Deshboard", "UserDeshboard");
             }
         }
 

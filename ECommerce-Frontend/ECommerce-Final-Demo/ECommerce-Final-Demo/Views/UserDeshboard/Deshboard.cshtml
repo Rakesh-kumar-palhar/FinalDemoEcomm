@@ -49,15 +49,13 @@ else
 </script>
  *@
 
-
 @{
     ViewBag.Title = "Dashboard";
     var role = ViewBag.Role as string;
-    
-    var errorMessage = TempData["ErrorMessage"] as string; // For error messages
+
+    var successMessage = TempData["SuccessMessage"] as string; // For success message
+    var errorMessage = TempData["errorMessage"] as string; // For error messages
 }
-
-
 
 @if (role == "SuperAdmin")
 {
@@ -82,9 +80,14 @@ else
         $(document).ready(function () {
             // Toastr notification for success message
             var successMessage = '@TempData["SuccessMessage"]';
-
+            var errorMessage = '@TempData["errorMessage"]';
             if (successMessage) {
                 toastr.success(successMessage, "Success");
+            }
+
+            // Show error toast if errorMessage is available
+            if (errorMessage) {
+                toastr.error(errorMessage, "Error");
             }
 
             toastr.options = {

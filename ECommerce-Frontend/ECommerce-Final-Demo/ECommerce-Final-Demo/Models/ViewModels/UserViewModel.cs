@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ECommerce_Final_Demo.Models.ViewModels
 {
@@ -19,6 +20,7 @@ namespace ECommerce_Final_Demo.Models.ViewModels
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Email must be a valid format.")]
+        [Remote(action: "IsEmailAvailable", controller: "Auth", ErrorMessage = "Email is already in use.")]
         public string Email { get; set; } = null!;
 
         [Required(ErrorMessage = "Mobile number is required.")]
@@ -27,14 +29,14 @@ namespace ECommerce_Final_Demo.Models.ViewModels
         public string MobileNumber { get; set; } = null!;
 
         [Required]
-        public string Role { get; set; } 
+        public string Role { get; set; } = "User";
 
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
 
-        public DateTime? UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "Active status is required.")]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public string? Profile { get; set; }
 
@@ -42,7 +44,7 @@ namespace ECommerce_Final_Demo.Models.ViewModels
 
        
         public IFormFile? ProfileImage { get; set; }
-
+        [Required(ErrorMessage = "Store Name is required.")]
         public Guid? StoreId { get; set; }
 
         [Required(ErrorMessage = "Password is required.")]

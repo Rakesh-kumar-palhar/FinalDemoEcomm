@@ -157,7 +157,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        ModelState.AddModelError("", "Invalid credentials. Please try again.");
+                        ModelState.AddModelError("", "Invalid User name and Password. Please try again.");
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
@@ -167,10 +167,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                
 
             }
-            else
-            {
-                ModelState.AddModelError("", "Invalid login attempt. Please try again.");
-            }
+            
 
             return View(model);
         }
@@ -247,11 +244,37 @@ namespace ECommerce_Demo_Frontend.Controllers
                 else
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
-                    ViewBag.ErrorMessage = "Old password is Wrong";
+                    ViewBag.ErrorMessage = "Current password is Wrong";
                 }
             }
 
             return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> IsEmailAvailable(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Json("Email is required.");
+            }
+            var httpClient = _httpClientFactory.CreateClient();
+            var url = $"{_baseUrl}Auth/EmailCheck?email={email}";
+            var response = await httpClient.GetAsync(url);           
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                bool emailExists = bool.TryParse(content, out bool exists) && exists;
+                if (emailExists)
+                {
+                    return Json($"{email} is already in use.");
+                }
+            }
+            else
+            {
+                return Json("Error checking email availability."); 
+            }
+
+            return Json(true);
         }
 
     }

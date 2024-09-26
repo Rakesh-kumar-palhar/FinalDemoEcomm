@@ -33,6 +33,7 @@ namespace ECommerce_Final_Demo.Services
             {
                 var logEntry = new Logger
                 {
+                   
                     Timestamp = DateTime.Now,
                     Message = message,
                     ExceptionType = exception?.ToString(),
