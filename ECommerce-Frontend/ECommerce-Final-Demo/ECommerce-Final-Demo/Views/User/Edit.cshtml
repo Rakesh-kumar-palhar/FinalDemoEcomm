@@ -1,6 +1,6 @@
 ﻿@model ECommerce_Final_Demo.Models.ViewModels.UserViewModel
 
-<h4>UserViewModel</h4>
+<h4>Edit User</h4>
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -64,7 +64,7 @@
 
             <div class="mb-3">
                 <label asp-for="StoreName" class="form-label"></label>
-                <select asp-for="StoreId" class="form-control" id="storeDropdown">
+                <select asp-for="StoreId" class="form-select" id="storeDropdown">
                     <option value="">Select Store</option>
                 </select>
                 <span asp-validation-for="StoreId" class="text-danger"></span>
@@ -126,3 +126,6 @@
         });
     </script>
 }
+
+
+

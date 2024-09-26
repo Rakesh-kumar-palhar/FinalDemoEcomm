@@ -19,6 +19,7 @@ namespace ECommerce_Final_Demo.Models
     public class OrderItemViewModel
     {
         public Guid ItemId { get; set; }
+        public string itemName { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public decimal TotalPrice => Quantity * Price;

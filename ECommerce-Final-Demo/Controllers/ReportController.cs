@@ -26,8 +26,11 @@ namespace ECommerce_Final_Demo.Controllers
                 // Get orders with their items and store information
                 var orders = await _context.Orders
                     .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Item) // Include the Item to access its properties 
                     .Include(o => o.Store)
                     .ToListAsync();
+
+
 
                 // Group by date and store
                 var report = orders
@@ -39,10 +42,10 @@ namespace ECommerce_Final_Demo.Controllers
                         TotalSales = g.Sum(o => o.OrderItems.Sum(oi => oi.Quantity * oi.Price)),
                         OrderItems = g.SelectMany(o => o.OrderItems.Select(oi => new OrderItemDto
                         {
-                            ItemId = oi.ItemId,                           
+                            ItemId = oi.ItemId,
                             Quantity = oi.Quantity,
                             Price = oi.Price,
-
+                            ItemName = oi.Item?.Name // Access the item name here add it last
                         })).ToList()
                     })
                     .OrderBy(r => r.Date)

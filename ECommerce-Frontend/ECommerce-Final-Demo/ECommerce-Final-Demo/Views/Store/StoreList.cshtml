@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.StoreViewModel>
 
-<h3>List of Stores</h3>
+<h3>Stores</h3>
 
 <!-- Button to create a new store -->
 <p>
@@ -11,10 +11,10 @@
 <table class="table table-bordered table-striped" id="Storetable">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th>@Html.DisplayNameFor(model => model.Country)</th>
-            <th>@Html.DisplayNameFor(model => model.State)</th>
-            <th>@Html.DisplayNameFor(model => model.City)</th>
+            <th>Store Name</th>
+            <th>Country</th>
+            <th>State</th>
+            <th>City</th>
             <th>Image</th>
             <th>Actions</th>
         </tr>
@@ -32,7 +32,10 @@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@store.Id">Edit</a> |
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@store.Id">Delete</a>
+                   
+
+                    <a asp-action="Delete" asp-route-id="@store.Id" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Are you sure you want to delete @store.Name ?');">Delete</a>
                 </td>
             </tr>
         }
@@ -42,7 +45,16 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#Storetable').DataTable();
+            $('#Storetable').DataTable({
+
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+
+                "columnDefs": [
+                    { "orderable": false, "targets": [ -2, -1] }
+                ],
+                "dom": '<"top"f>rt<"bottom"lp><"clear">'
+            });
         });
     </script>
 }

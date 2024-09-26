@@ -1,8 +1,13 @@
-﻿namespace ECommerce_Final_Demo.Models.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ECommerce_Final_Demo.Models.ViewModels
 {
     public class StoreViewModel
     {
         public Guid Id { get; set; }
+        [Required(ErrorMessage = "Store name is required.")]
+        [StringLength(50, ErrorMessage = "Store name cannot be longer than 50 characters.")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Store name can only contain alphabetic characters.")]
         public string Name { get; set; } = null!;
 
         public int CountryId { get; set; }

@@ -43,7 +43,7 @@
                         @Html.Hidden("id", item.Id)
                         @Html.Hidden("price", item.Price)
                         <input type="number" name="quantity" min="1" value="1" style="width:60px;" />
-                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        <button type="submit" class="btn btn-primary" onclick="showAddToCartAlert()" >Add to Cart</button>
                     }
                 </td>
             </tr>
@@ -63,7 +63,28 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#Itemtable').DataTable();
+            $('#Itemtable').DataTable({
+
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+
+                "columnDefs": [
+                    { "orderable": false, "targets": [-2, -1] }
+                ],
+                "dom": '<"top"f>rt<"bottom"lp><"clear">'
+            });
         });
+
+        function showAddToCartAlert() {
+            toastr.success("The item has been added to your cart!", "Success");
+        }
+
+        // Optional: Customize Toastr options
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000" // 3 seconds
+        };
     </script>
 }

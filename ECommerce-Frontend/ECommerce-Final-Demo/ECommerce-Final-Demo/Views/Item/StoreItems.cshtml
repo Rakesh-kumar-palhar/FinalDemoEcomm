@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.ItemViewModel>
 
-<h3>List of Items</h3>
+<h3>Items</h3>
 
-<!-- Button to create a new item -->
+
 <p>
     <a class="btn btn-primary" asp-action="Create">Create</a>
 </p>
@@ -32,7 +32,8 @@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-info" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Are you sure you want to delete @item.Name from @item.StoreName ?');">Delete</a>
                 </td>
             </tr>
         }
@@ -41,7 +42,16 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#Itemtable').DataTable();
+            $('#Itemtable').DataTable({
+
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+
+                "columnDefs": [
+                    { "orderable": false, "targets": [ -2, -1] }
+                ],
+                "dom": '<"top"f>rt<"bottom"lp><"clear">'
+            });
         });
     </script>
 }

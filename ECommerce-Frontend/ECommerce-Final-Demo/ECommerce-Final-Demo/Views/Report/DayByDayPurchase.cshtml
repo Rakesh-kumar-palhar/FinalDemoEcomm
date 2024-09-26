@@ -30,7 +30,8 @@
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Item ID</th>
+                                       
+                                        <th>Item Name</th>
                                         <th>Quantity</th>
                                         <th>Price</th>
                                         <th>Total Price</th>
@@ -40,7 +41,8 @@
                                     @foreach (var item in report.OrderItems)
                                     {
                                         <tr>
-                                            <td>@item.ItemId</td>
+                                            
+                                            <td>@item.itemName</td>
                                             <td>@item.Quantity</td>
                                             <td>@item.Price.ToString("C")</td>
                                             <td>@item.TotalPrice.ToString("C")</td>

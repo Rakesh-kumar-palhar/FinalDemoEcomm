@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="~/ECommerce_Final_Demo.styles.css" asp-append-version="true" />
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+   
 </head>
 <body>
     
@@ -55,45 +56,45 @@
                     <li>
                         <a href="@Url.Action("StoreUsers", "User")">
                             <i class="fa fa-sort-alpha-asc" aria-hidden="true">
-                            </i> <span style="margin-left:10px;">ManageUser</span>                            
+                            </i> <span style="margin-left:10px;">User</span>                            
                                           
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("StoreList", "Store")">
                             <i class="fa fa-play-circle-o" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ManageStore</span>
+                            <span style="margin-left:10px;">Store</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("StoreItems", "Item")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ManageItem</span>
+                            <span style="margin-left:10px;">Item</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("DayByDayPurchase", "Report")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">PurchaseReport</span>
+                            <span style="margin-left:10px;">Purchase Report</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("ListOrders", "Order")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ManageOrder</span>
+                            <span style="margin-left:10px;">Order</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("Edit", "User", new {  id = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value })">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">EditProfile</span>
+                            <span style="margin-left:10px;">Edit Profile</span>
                         </a>
                     </li>
 
                     <li>
                         <a href="@Url.Action("ChangePassword", "Auth")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ChangePassword</span>
+                            <span style="margin-left:10px;">Change Password</span>
                         </a>
                     </li>
 
@@ -109,37 +110,37 @@
                     <li>
                         <a href="@Url.Action("StoreUsers", "User")">
                             <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ManageUser</span>
+                            <span style="margin-left:10px;">User</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("StoreItems", "Item")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ManageItem</span>
+                            <span style="margin-left:10px;">Item</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("ListOrders", "Order")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ManageOrder</span>
+                            <span style="margin-left:10px;">Order</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("DayByDayPurchase", "Report")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">PurchaseReport</span>
+                            <span style="margin-left:10px;">Purchase Report</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("Edit", "User", new {  id = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value })">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">EditProfile</span>
+                            <span style="margin-left:10px;">Edit Profile</span>
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("ChangePassword", "Auth")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ChangePassword</span>
+                            <span style="margin-left:10px;">Change Password</span>
                         </a>
                     </li>
 
@@ -166,7 +167,7 @@
                     <li>
                         <a href="@Url.Action("ChangePassword", "Auth")">
                             <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
-                            <span style="margin-left:10px;">ChangePassword</span>
+                            <span style="margin-left:10px;">Change Password</span>
                         </a>
                     </li>
                     <form asp-action="Logout" asp-controller="Auth" method="post" style="display:inline;">
@@ -194,6 +195,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
         $("#menu-toggle").click(function (e) {

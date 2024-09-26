@@ -9,15 +9,15 @@
 <table class="table table-striped table-bordered"id="usertable">
     <thead class="thead-dark">
         <tr>
-            <th>@Html.DisplayNameFor(model => model.FirstName)</th>
-            <th>@Html.DisplayNameFor(model => model.LastName)</th>
-            <th>@Html.DisplayNameFor(model => model.Email)</th>
-            <th>@Html.DisplayNameFor(model => model.MobileNumber)</th>
-            <th>@Html.DisplayNameFor(model => model.Role)</th>
-            <th>@Html.DisplayNameFor(model => model.CreateDate)</th>
-            <th>@Html.DisplayNameFor(model => model.IsActive)</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Role</th>
+            <th>CreateDate</th>
+            <th>IsActive</th>
             <th>Profile</th>
-            <th>@Html.DisplayNameFor(model => model.StoreName)</th>
+            <th>Store Name</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -31,7 +31,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Email)</td>
                 <td>@Html.DisplayFor(modelItem => item.MobileNumber)</td>
                 <td>@Html.DisplayFor(modelItem => item.Role)</td>
-                <td>@Html.DisplayFor(modelItem => item.CreateDate)</td>
+                <td>@item.CreateDate.ToString("MM/dd/yyyy")</td>
                 <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
                 <td>
                     <img src="@Url.Content("~/images/" + item.Profile)" alt="Profile Image" style="width:70px; height:auto;" />
@@ -39,7 +39,8 @@
                 <td>@Html.DisplayFor(modelItem => item.StoreName)</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Are you sure you want to delete @item.FirstName @item.LastName?');">Delete</a>
                 </td>
             </tr>
         }
@@ -47,8 +48,17 @@
 </table>
 @section Scripts{
     <script>
-     $(document).ready(function () {
-        $('#usertable').DataTable();
+        $(document).ready(function () {
+            $('#usertable').DataTable({ 
+
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+
+                          "columnDefs": [
+                    { "orderable": false, "targets": [-6,-4,-3, -1] }
+                ],
+                "dom": '<"top"f>rt<"bottom"lp><"clear">'
+            });
     });
     </script>
 }

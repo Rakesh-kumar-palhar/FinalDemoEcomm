@@ -52,8 +52,8 @@ namespace ECommerce_Final_Demo.Controllers
                 }
                 else
                 {
-                   
-                    TempData["ErrorMessage"] = "Error adding item to cart: " + await response.Content.ReadAsStringAsync();
+
+                    TempData["ErrorMessage"] = "Error adding item to cart: "; 
                 }
             }
             catch (HttpRequestException e)

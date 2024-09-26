@@ -32,11 +32,6 @@ namespace ECommerce_Final_Demo.Controllers
                 var existingUser = await _context.Users
                    .FirstOrDefaultAsync(u => u.Email == model.Email);
 
-                if (model.Email == "trigger500@example.com")
-                {
-                    throw new InvalidOperationException("This is a test to trigger a 500 error.");
-                }
-
                 if (existingUser != null)
                 {
                     return BadRequest(new { Message = "User with this email already exists." });
@@ -172,6 +167,19 @@ namespace ECommerce_Final_Demo.Controllers
                 _logger.LogError(ex, "An error occurred during change for password");  // Logging the exception with relevant details
                 return StatusCode(500, new { Message = "An error occurred during change password." });
             }
+        }
+
+        [HttpGet("EmailCheck")]
+        public async Task<bool> IsEmailAvailable(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return false; // Return false if no email is provided
+            }
+
+            
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == email);
+            return emailExists; 
         }
     }
 }

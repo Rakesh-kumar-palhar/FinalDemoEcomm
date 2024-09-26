@@ -1,7 +1,7 @@
 ﻿@model ECommerce_Final_Demo.Models.ViewModels.UserViewModel
 
 <div class="container mt-4">
-    <h4>User Registration</h4>
+    <h4>User Creation</h4>
     <hr />
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -31,14 +31,18 @@
                     <input asp-for="MobileNumber" class="form-control" />
                     <span asp-validation-for="MobileNumber" class="text-danger"></span>
                 </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select id="role" name="Role" class="form-control">
+                        <option value="">Select a role</option>
+                        <option value="User">User</option>
+                        <option value="StoreAdmin">Store Admin</option>
+                        
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
 
-                 <div class="mb-3">
-                    <label asp-for="Role" class="form-label"></label>
-                    <input asp-for="Role" class="form-control" />
-                    <span asp-validation-for="Role" class="text-danger"></span>
-                </div> 
-
-                 <div class="mb-3">
+                <div class="mb-3">
                     <label asp-for="CreateDate" class="form-label"></label>
                     <input asp-for="CreateDate" class="form-control" />
                     <span asp-validation-for="CreateDate" class="text-danger"></span>
@@ -106,6 +110,8 @@
                     alert('Failed to load store data.');
                 }
             });
+
         });
     </script>
+    
 }

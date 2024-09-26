@@ -15,7 +15,7 @@ namespace ECommerce_Final_Demo.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<StoreController> _logger;
-        public StoreController(ApplicationDbContext context,Logger<StoreController> logger)
+        public StoreController(ApplicationDbContext context, ILogger<StoreController> logger)
         {
             _context = context;
             _logger = logger;

@@ -57,13 +57,31 @@ else
                     <td>
                         <form asp-action="RemoveFromCart" method="post">
                             <input type="hidden" name="itemId" value="@item.ItemId" />
-                            <button type="submit" class="btn btn-danger">Remove</button>
+                            <button type="submit" class="btn btn-danger" onclick="showremoveToCartAlert">Remove</button>
                         </form>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+}
+
+@section Scripts{
+    <script>
+
+        function showremoveToCartAlert() {
+            toastr.success("The item is remove from your cart!", "Success");
+        }
+
+        // Optional: Customize Toastr options
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "5000" // 5 seconds
+        };
+
+    </script>
 }
 
 

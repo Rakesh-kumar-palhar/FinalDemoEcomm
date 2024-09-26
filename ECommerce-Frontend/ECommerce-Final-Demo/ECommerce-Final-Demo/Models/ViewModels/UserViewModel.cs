@@ -17,7 +17,7 @@ namespace ECommerce_Final_Demo.Models.ViewModels
         public string LastName { get; set; } = null!;
 
         [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email address format.")]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Email must be a valid format.")]
         public string Email { get; set; } = null!;
 
@@ -26,8 +26,8 @@ namespace ECommerce_Final_Demo.Models.ViewModels
         [StringLength(15, ErrorMessage = "Mobile number cannot be longer than 15 characters.")]
         public string MobileNumber { get; set; } = null!;
 
-        [Required(ErrorMessage = "Role is required.")]
-        public string Role { get; set; } = null!;
+        [Required]
+        public string Role { get; set; } 
 
         public DateTime CreateDate { get; set; }
 
