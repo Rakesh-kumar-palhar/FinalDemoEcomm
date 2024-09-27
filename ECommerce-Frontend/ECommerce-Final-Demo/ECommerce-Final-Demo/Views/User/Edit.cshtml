@@ -1,5 +1,7 @@
 ﻿@model ECommerce_Final_Demo.Models.ViewModels.UserViewModel
-
+ @{
+    bool isCreatingUser = ViewData["IsCreatingUser"] != null && (bool)ViewData["IsCreatingUser"];
+ }
 <h4>Edit User</h4>
 <hr />
 <div class="row">
@@ -27,7 +29,7 @@
 
             <div class="mb-3">
                 <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" readonly class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
@@ -51,25 +53,36 @@
                     @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="StoreName" class="form-label"></label>
-                <select asp-for="StoreId" class="form-select" id="storeDropdown">
-                    <option value="">Select Store</option>
-                </select>
-                <span asp-validation-for="StoreId" class="text-danger"></span>
-            </div>
-
+            @if (User.IsInRole("User") || (User.IsInRole("SuperAdmin") && (bool)ViewData["IsCreatingUser"]))
+            {
+                <div class="mb-3">
+                    <label asp-for="StoreName" class="form-label"></label>
+                    <select asp-for="StoreId" class="form-select" id="storeDropdown">
+                        <option value="">Select Store</option>
+                        <!-- Assuming you will populate this with stores via JavaScript or backend -->
+                    </select>
+                    <span asp-validation-for="StoreId" class="text-danger"></span>
+                </div>
+            }
             <div class="mb-3">
                
                 <input asp-for="Password" hidden />
                
             </div>
-
+            <input asp-for="createdBy" hidden value="@string.Empty" />
+            
             <div class="mb-3">
                 <label for="profileImagePreview" class="form-label">Profile Image</label>
                 <div id="profileImagePreview">
-                    <img src="~/Images/@Model.Profile" id="profileImage" alt="Profile Image" style="max-width: 200px;" />
+                    @if (!string.IsNullOrEmpty(Model.Profile))
+                    {
+                        <input asp-for="Profile" hidden />
+                        <img src="~/Images/@Model.Profile" id="profileImage" alt="Profile Image" style="max-width: 200px;"  />
+                    }
+                    else
+                    {
+                        <img src="~/Images/default-placeholder.png" id="profileImage" alt="Default Image" style="max-width: 200px;"  />
+                    }
                 </div>
             </div>
 
@@ -100,6 +113,7 @@
 
 
         $(document).ready(function () {
+            var selectStoreid = '@Model.StoreId';
             $.ajax({
                 url: '@Url.Action("GetStores", "Store")',
                 type: 'GET',
@@ -118,6 +132,7 @@
                             text: store.name
                         }));
                     });
+                    $('#storeDropdown').val(selectStoreid)
                 },
                 error: function (xhr, status, error) {
                     console.log("Error: " + error);

@@ -18,11 +18,9 @@ namespace ECommerce_Final_Demo.Models
         public string? StoreName{ get; set; }
         public string? Profile { get; set; }
         public Guid? StoreId { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
-
-
-       
-        
 
     }
 }

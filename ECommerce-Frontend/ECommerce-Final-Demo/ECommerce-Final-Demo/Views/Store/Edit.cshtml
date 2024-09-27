@@ -6,11 +6,7 @@
     <div class="col-md-4">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
+            
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -40,10 +36,20 @@
                 </select>
                 <span asp-validation-for="CityId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control" />
-                <span asp-validation-for="Image" class="text-danger"></span>
+            
+            <div class="mb-3">
+                <label for="ImageFilePreview" class="form-label">Profile Image</label>
+                <div id="ImageFilePreview">
+                    @if (!string.IsNullOrEmpty(Model.Image))
+                    {
+                        <input asp-for="Image" hidden />
+                        <img src="~/Images/@Model.Image" id="profileImage" alt="Profile Image" style="max-width: 200px;" />
+                    }
+                    else
+                    {
+                        <img src="~/Images/default-placeholder.png" id="ImageFile" alt="Default Image" style="max-width: 200px;" />
+                    }
+                </div>
             </div>
             <div class="form-group">
                 <label asp-for="ImageFile" class="control-label"></label>
@@ -65,45 +71,61 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
+            var selectCountryid = '@Model.CountryId';
+            var selectStateid = '@Model.StateId';
+            var selectCityid = '@Model.CityId';
+
             // Load countries on page load
             $.getJSON('@Url.Action("LoadCountries", "Location")', function (countries) {
-
                 $.each(countries, function (index, country) {
                     $('#CountryId').append('<option value="' + country.id + '">' + country.name + '</option>');
+                    if (country.id == selectCountryid) {
+                        countryExists = true;
+                    }
                 });
+                if (countryExists) {
+                    $('#CountryId').val(selectCountryid).trigger("change");
+                } else {
+                    $('#CountryId').val('');
+                }
             });
 
             // Load states when a country is selected
             $('#CountryId').change(function () {
                 var countryId = $(this).val();
-                $('#StateId').empty();
-                $('#CityId').empty();
-                $('#StateId').append('<option value="">Select State</option>');
-                $('#CityId').append('<option value="">Select City</option>');
+                $('#StateId').empty().append('<option value="">Select State</option>');
+                $('#CityId').empty().append('<option value="">Select City</option>');
                 if (countryId) {
                     $.getJSON('@Url.Action("LoadStates", "Location")', { countryId: countryId }, function (states) {
-                        $('#StateId').append('<option value="">Select State</option>');
                         $.each(states, function (index, state) {
                             $('#StateId').append('<option value="' + state.id + '">' + state.name + '</option>');
                         });
+                        $('#StateId').val(selectStateid).trigger("change");
                     });
-
                 }
-                
             });
 
             // Load cities when a state is selected
             $('#StateId').change(function () {
                 var stateId = $(this).val();
-                $('#CityId').empty();
+                $('#CityId').empty().append('<option value="">Select City</option>');
                 if (stateId) {
                     $.getJSON('@Url.Action("LoadCities", "Location")', { stateId: stateId }, function (cities) {
-                        $('#CityId').append('<option value="">Select City</option>');
                         $.each(cities, function (index, city) {
                             $('#CityId').append('<option value="' + city.id + '">' + city.name + '</option>');
                         });
+                        $('#CityId').val(selectCityid);
                     });
                 }
+            });
+
+            // Preview image on file selection
+            $('#ImageFile').change(function (event) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    $('#profileImage').attr('src', reader.result);
+                };
+                reader.readAsDataURL(event.target.files[0]);
             });
         });
     </script>

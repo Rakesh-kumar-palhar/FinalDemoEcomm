@@ -9,6 +9,7 @@ using System.Text.Json;
 using ECommerce_Final_Demo.FileUpload;
 using NuGet.Common;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace ECommerce_Final_Demo.Controllers
 {
@@ -124,6 +125,18 @@ namespace ECommerce_Final_Demo.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid Id)
         {
+            var sessionUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (sessionUserId == null || sessionUserId != Id.ToString())
+            {
+
+                ViewData["IsCreatingUser"] = true;
+
+            }
+            else
+            {
+                ViewData["IsCreatingUser"] = false;
+                
+            }
             var httpClient = _httpClientFactory.CreateClient();
             SetAuthorizationHeader(httpClient);
             var url = $"{_baseUrl}User/getbyid{Id}";
@@ -148,12 +161,12 @@ namespace ECommerce_Final_Demo.Controllers
             {
                 return View(userViewModel);
             }
-
+           
             // Handle image upload
             string imagePath = userViewModel.ProfileImage != null
                 ? await _fileUploadService.UploadFileAsync(userViewModel.ProfileImage, _imageUploadPath)
                 : userViewModel.Profile; // Assuming Image holds the current image name
-
+            var updatedBy = User.FindFirst(ClaimTypes.Role)?.Value;
             var userData = new
             {
                 userViewModel.Id,
@@ -167,6 +180,7 @@ namespace ECommerce_Final_Demo.Controllers
                 userViewModel.IsActive,
                 userViewModel.Password,
                 userViewModel.StoreId,
+                updatedBy,
                 Profile = imagePath 
             };
 
@@ -187,6 +201,8 @@ namespace ECommerce_Final_Demo.Controllers
             // Add more detailed error information
             var errorMessage = await response.Content.ReadAsStringAsync();
             ModelState.AddModelError("", $"Unable to update user. Server response: {errorMessage}");
+
+           
             return View(userViewModel);
         }
 
@@ -223,7 +239,9 @@ namespace ECommerce_Final_Demo.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            var Model = new UserViewModel { IsActive = true };
+
+            return View(Model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -246,6 +264,7 @@ namespace ECommerce_Final_Demo.Controllers
                     imagePath = await _fileUploadService.UploadFileAsync(userViewModel.ProfileImage, _imageUploadPath);
 
                 }
+                var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
                 var userData = new
                 {
                     id = userViewModel.Id, 
@@ -259,7 +278,8 @@ namespace ECommerce_Final_Demo.Controllers
                     updateDate = userViewModel.UpdateDate,
                     isActive = userViewModel.IsActive,
                     profile = imagePath, // Pass the image file name or path (depending on your needs)
-                    storeId = userViewModel.StoreId
+                    storeId = userViewModel.StoreId,
+                    createdBy= currentUserRole
                 };
 
                 var json = JsonSerializer.Serialize(userData);
@@ -282,6 +302,7 @@ namespace ECommerce_Final_Demo.Controllers
 
 
             }
+            ViewData["IsCreatingUser"] = true;
             return View(userViewModel);
         }
 

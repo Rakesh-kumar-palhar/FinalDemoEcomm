@@ -163,6 +163,7 @@ namespace ECommerce_Demo_Frontend.Controllers
                     {
                         ModelState.AddModelError("", "User not registered. Please sign up first.");
                     }
+
                 }
                
 
@@ -238,8 +239,8 @@ namespace ECommerce_Demo_Frontend.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     ViewBag.Message = "Password changed successfully.";
-                    return RedirectToAction("Login");
-                  
+                    return RedirectToAction("Deshboard", "UserDeshboard");
+
                 }
                 else
                 {

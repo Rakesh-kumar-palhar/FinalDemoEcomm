@@ -6,7 +6,7 @@
         public string FName { get; set; } = null!;
         public string LName { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public string Password { get; set; } // Note: Passwords are usually not included in DTOs for security reasons
+        public string Password { get; set; } 
         public string MobileNumber { get; set; } = null!;
         public string Role { get; set; } = null!;
         public DateTime CreateDate { get; set; }
@@ -15,8 +15,8 @@
         public string? Profile { get; set; }
         public Guid? StoreId { get; set; }
         public string? StoreName { get; set; }
-         public string? CreatedBy { get; set; }
-         public string? UpdatedBy { get; set; }
+         public string? createdBy { get; set; }
+         public string? updatedBy { get; set; }
         public string? Token { get; set; }
 
         public static UserDto Mapping(User user)
@@ -27,7 +27,7 @@
                 FName = user.FName,
                 LName = user.LName,
                 Email = user.Email,
-                Password = user.Password, // Handle passwords securely
+                Password = user.Password, 
                 MobileNumber = user.MobileNumber,
                 Role = user.Role,
                 CreateDate = user.CreateDate,
@@ -36,8 +36,8 @@
                 Profile = user.Profile,
                 StoreId = user.StoreId,
                 StoreName= user.Store?.Name,
-                //CreatedBy = user.CreatedBy,
-                //UpdatedBy = user.UpdatedBy,
+                createdBy = user.CreatedBy,
+                updatedBy = user.UpdatedBy,
                 Token = user.Token
             };
         }
@@ -68,9 +68,9 @@
                 IsActive = userDto.IsActive,
                 Profile = userDto.Profile,
                 StoreId = userDto.StoreId,
-                // CreatedBy = userDto.CreatedBy,
-                //UpdatedBy = userDto.UpdatedBy,
-                 Token = userDto.Token
+                CreatedBy = userDto.createdBy,
+                UpdatedBy = userDto.updatedBy,
+                Token = userDto.Token
             };
         }
 

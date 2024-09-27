@@ -1,4 +1,20 @@
 ﻿@model IEnumerable<ECommerce_Final_Demo.Models.ViewModels.ItemViewModel>
+@{
+    // Extract the list of CartItemViewModel from ViewBag
+    var cartItems = ViewBag.cartItems as List<ECommerce_Final_Demo.Models.ViewModels.CartItemViewModel>;
+
+    List<Guid> itemIds = new List<Guid>();    
+    if (cartItems != null && cartItems.Count > 0)
+    {
+
+        foreach (var cartItem in cartItems)
+        {
+            itemIds.Add(cartItem.ItemId);
+            Console.WriteLine(cartItem.ItemId);
+        }
+    }
+    
+}
 
 <table class="table" id="Itemtable">
     <thead>
@@ -35,14 +51,21 @@
                     <img src="@Url.Content("~/images/" + item.Image)" alt="Item Image" style="width:50px; height:auto;" />
                 </td>
                 <td>
-                    <!-- Form for adding item to the cart -->
-                    @using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post))
+                    @if (!@itemIds.Contains(item.Id))
                     {
-                        @Html.Hidden("id", item.Id)  <!-- ItemId -->
-                        @Html.Hidden("price", item.Price)  <!-- Item Price -->
-                       
-                        <button type="submit" class="btn btn-primary" onclick="showAddToCartAlert()">Add to Cart</button>
+                        
+                        @using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post))
+                        {
+                            @Html.Hidden("id", item.Id)  <!-- ItemId -->
+                            @Html.Hidden("price", item.Price)  <!-- Item Price -->
+                            <button type="submit" class="btn btn-primary" onclick="showAddToCartAlert()">Add to Cart</button>
+                        }
                     }
+                    else
+                    {
+                        <span>Already in cart</span>
+                    }
+                    <!-- Form for adding item to the cart -->
                 </td>
             </tr>
         }

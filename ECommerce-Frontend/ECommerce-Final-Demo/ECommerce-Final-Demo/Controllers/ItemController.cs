@@ -201,6 +201,7 @@ namespace ECommerce_Final_Demo.Controllers
             return View(ItemViewModel);
         }
 
+        //add to cart button here
         public async Task<IActionResult> GetStoreItems()
         {
 
@@ -226,6 +227,26 @@ namespace ECommerce_Final_Demo.Controllers
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use camelCase to match JSON property names
                 });
                 var ItemViewModels = Items.Select(Item.ToViewModel).ToList();
+
+                var token = HttpContext.Session.GetString("UserSession");
+
+                SetAuthorizationHeader(httpClient);
+                var getCartItemsUrl = $"{_baseUrl}Cart/items";
+
+                response = await httpClient.GetAsync(getCartItemsUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    var cartItems = JsonSerializer.Deserialize<List<CartItemViewModel>>(jsonResponse, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use camelCase to match JSON property names
+                    });
+
+                    ViewBag.cartItems = cartItems;
+                }
+               
                 return View(ItemViewModels);
 
 

@@ -151,7 +151,7 @@ namespace ECommerce_Final_Demo.Controllers
                 existingUser.IsActive = userDto.IsActive;
                 existingUser.Profile = userDto.Profile;
                 existingUser.StoreId = userDto.StoreId;
-               
+                existingUser.UpdatedBy = userDto.updatedBy;
                 existingUser.Token = userDto.Token;
 
                 _context.Users.Update(existingUser);

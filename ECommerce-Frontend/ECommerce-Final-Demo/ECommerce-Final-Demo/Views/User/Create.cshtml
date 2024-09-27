@@ -10,15 +10,15 @@
 
                 <div class="mb-3">
                     <label asp-for="FirstName" class="form-label">
-                        <span class="text-danger">*</span> First Name
+                        First Name<span class="text-danger">*</span>
                     </label>
                     <input asp-for="FirstName" class="form-control" required />
                     <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
-
+                <input asp-for="createdBy" hidden value="@string.Empty" />
                 <div class="mb-3">
                     <label asp-for="LastName" class="form-label">
-                        <span class="text-danger">*</span> Last Name
+                        Last Name<span class="text-danger">*</span>
                     </label>
                     <input asp-for="LastName" class="form-control" required />
                     <span asp-validation-for="LastName" class="text-danger"></span>
@@ -26,7 +26,7 @@
 
                 <div class="mb-3">
                     <label asp-for="Email" class="form-label">
-                        <span class="text-danger">*</span> Email
+                        Email<span class="text-danger">*</span>
                     </label>
                     <input asp-for="Email" class="form-control" required />
                     <span asp-validation-for="Email" class="text-danger"></span>
@@ -34,7 +34,7 @@
 
                 <div class="mb-3">
                     <label asp-for="MobileNumber" class="form-label">
-                        <span class="text-danger">*</span> Mobile Number
+                        Mobile Number<span class="text-danger">*</span>
                     </label>
                     <input asp-for="MobileNumber" class="form-control" required />
                     <span asp-validation-for="MobileNumber" class="text-danger"></span>
@@ -55,7 +55,7 @@
 
                 <div class="mb-3">
                     <label asp-for="StoreName" class="form-label">
-                        <span class="text-danger">*</span> Store
+                        Store<span class="text-danger">*</span>
                     </label>
                     <select asp-for="StoreId" class="form-select" id="storeDropdown" required>
                         <option value="">Select Store</option>
@@ -65,7 +65,7 @@
 
                 <div class="mb-3">
                     <label asp-for="Password" class="form-label">
-                        <span class="text-danger">*</span> Password
+                        Password <span class="text-danger">*</span>
                     </label>
                     <input asp-for="Password" class="form-control" type="password" required />
                     <span asp-validation-for="Password" class="text-danger"></span>

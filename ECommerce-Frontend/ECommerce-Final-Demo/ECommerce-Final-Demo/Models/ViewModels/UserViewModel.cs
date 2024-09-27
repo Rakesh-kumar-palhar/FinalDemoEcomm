@@ -44,14 +44,13 @@ namespace ECommerce_Final_Demo.Models.ViewModels
 
        
         public IFormFile? ProfileImage { get; set; }
-        [Required(ErrorMessage = "Store Name is required.")]
+        //[Required(ErrorMessage = "Store Name is required.")]
         public Guid? StoreId { get; set; }
 
-        [Required(ErrorMessage = "Password is required.")]
-        
-        
+        [Required(ErrorMessage = "Password is required.")]      
         public string Password { get; set; }
-
+        public string? createdBy { get; set; }
+        public string? updatedBy { get; set; }
         public static User FromViewModel(UserViewModel viewModel)
         {
             return new User
@@ -67,7 +66,9 @@ namespace ECommerce_Final_Demo.Models.ViewModels
                 UpdateDate = viewModel.UpdateDate,
                 IsActive = viewModel.IsActive,
                 Profile = viewModel.ProfileImage?.FileName,
-                StoreId = viewModel.StoreId
+                StoreId = viewModel.StoreId,
+                CreatedBy = viewModel.createdBy,
+                UpdatedBy = viewModel.updatedBy
             };
         }
         public static UserViewModel ToViewModel(User user)
@@ -87,7 +88,9 @@ namespace ECommerce_Final_Demo.Models.ViewModels
                 ProfileImage = null,
                 Profile = user.Profile,
                 StoreId = user.StoreId,
-                StoreName = user.StoreName
+                StoreName = user.StoreName,
+                createdBy=user.CreatedBy,
+                updatedBy=user.UpdatedBy
             };
         }
     }
